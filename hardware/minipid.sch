@@ -1,0 +1,758 @@
+EESchema Schematic File Version 4
+LIBS:minipid-cache
+EELAYER 26 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title "minipid"
+Date "2018-09-24"
+Rev "1"
+Comp "michael@walle.cc"
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Transformer:TEZ0.5-D-1 TR1
+U 1 1 5BA6C6E0
+P 2550 1600
+F 0 "TR1" H 2550 2025 50  0000 C CNN
+F 1 "6V 0.33VA" H 2550 1934 50  0000 C CNN
+F 2 "Transformer_THT:Transformer_Breve_TEZ-22x24" H 2550 1250 50  0001 C CIN
+F 3 "http://www.breve.pl/pdf/ANG/TEZ_ang.pdf" H 2550 1600 50  0001 C CNN
+F 4 "150.09-1" H 2550 1600 50  0001 C CNN "Reichelt"
+	1    2550 1600
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Bridge_+-AA D1
+U 1 1 5BA6D41B
+P 3250 1600
+F 0 "D1" H 2909 1554 50  0000 R CNN
+F 1 "DB1A70" H 2909 1645 50  0000 R CNN
+F 2 "Diode_THT:Diode_Bridge_DIP-4_W7.62mm_P5.08mm" H 3250 1600 50  0001 C CNN
+F 3 "~" H 3250 1600 50  0001 C CNN
+F 4 "B700C1000DIP" H 3250 1600 50  0001 C CNN "Reichelt"
+	1    3250 1600
+	1    0    0    1   
+$EndComp
+$Comp
+L Device:CP C2
+U 1 1 5BA6D783
+P 4150 1900
+F 0 "C2" H 4268 1946 50  0000 L CNN
+F 1 "330u" H 4268 1855 50  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm" H 4188 1750 50  0001 C CNN
+F 3 "~" H 4150 1900 50  0001 C CNN
+F 4 "RUBY 25ZLJ330MT" H 4150 1900 50  0001 C CNN "Reichelt"
+	1    4150 1900
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:CP C3
+U 1 1 5BA6D879
+P 5300 1900
+F 0 "C3" H 5418 1946 50  0000 L CNN
+F 1 "100u" H 5418 1855 50  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D6.3mm_P2.50mm" H 5338 1750 50  0001 C CNN
+F 3 "~" H 5300 1900 50  0001 C CNN
+F 4 "RUBY 25YXH100MT1" H 5300 1900 50  0001 C CNN "Reichelt"
+	1    5300 1900
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C1
+U 1 1 5BA6D95C
+P 2000 6950
+F 0 "C1" H 2115 6996 50  0000 L CNN
+F 1 "100n" H 2115 6905 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 2038 6800 50  0001 C CNN
+F 3 "~" H 2000 6950 50  0001 C CNN
+F 4 "X7R-5 100N" H 2000 6950 50  0001 C CNN "Reichelt"
+	1    2000 6950
+	1    0    0    -1  
+$EndComp
+$Comp
+L Relay_SolidState:MOC3063M U3
+U 1 1 5BA6DB66
+P 2500 2800
+F 0 "U3" H 2500 3125 50  0000 C CNN
+F 1 "MOC3063M" H 2500 3034 50  0000 C CNN
+F 2 "Package_DIP:DIP-6_W7.62mm" H 2300 2600 50  0001 L CIN
+F 3 "http://www.fairchildsemi.com/ds/MO/MOC3061M.pdf" H 2465 2800 50  0001 L CNN
+F 4 "MOC 3063" H 0   0   50  0001 C CNN "Reichelt"
+	1    2500 2800
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Device:Q_TRIAC_A1A2G D2
+U 1 1 5BA6DD63
+P 1700 2950
+F 0 "D2" H 1750 3050 50  0000 L CNN
+F 1 "BTA 08/600BW" H 1050 2750 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Horizontal_TabDown" V 1775 2975 50  0001 C CNN
+F 3 "~" V 1700 2950 50  0001 C CNN
+F 4 "BTB 08/600BW" H 0   0   50  0001 C CNN "Reichelt"
+	1    1700 2950
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Device:Fuse F1
+U 1 1 5BA6DEE6
+P 2000 1800
+F 0 "F1" V 2197 1800 50  0000 C CNN
+F 1 "100mA" V 2106 1800 50  0000 C CNN
+F 2 "Fuse:Fuseholder_TR5_Littlefuse_No560_No460" V 1930 1800 50  0001 C CNN
+F 3 "~" H 2000 1800 50  0001 C CNN
+F 4 "MIK-FLINK 0,1A" V 2000 1800 50  0001 C CNN "Reichelt"
+	1    2000 1800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Connector:Screw_Terminal_01x02 J1
+U 1 1 5BA6E99F
+P 1250 1550
+F 0 "J1" H 1170 1767 50  0000 C CNN
+F 1 "Mains" H 1170 1676 50  0000 C CNN
+F 2 "TerminalBlock_RND:TerminalBlock_RND_205-00001_1x02_P5.00mm_Horizontal" H 1250 1550 50  0001 C CNN
+F 3 "~" H 1250 1550 50  0001 C CNN
+F 4 "RND 205-00001" H 0   0   50  0001 C CNN "Reichelt"
+	1    1250 1550
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector:Screw_Terminal_01x02 J2
+U 1 1 5BA6EA10
+P 1200 2800
+F 0 "J2" H 1120 2475 50  0000 C CNN
+F 1 "Load" H 1120 2566 50  0000 C CNN
+F 2 "TerminalBlock_RND:TerminalBlock_RND_205-00001_1x02_P5.00mm_Horizontal" H 1200 2800 50  0001 C CNN
+F 3 "~" H 1200 2800 50  0001 C CNN
+F 4 "RND 205-00001" H 0   0   50  0001 C CNN "Reichelt"
+	1    1200 2800
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector:Screw_Terminal_01x02 J3
+U 1 1 5BA6EAA0
+P 8800 2400
+F 0 "J3" H 8880 2392 50  0000 L CNN
+F 1 "PT1000" H 8880 2301 50  0000 L CNN
+F 2 "TerminalBlock_RND:TerminalBlock_RND_205-00001_1x02_P5.00mm_Horizontal" H 8800 2400 50  0001 C CNN
+F 3 "~" H 8800 2400 50  0001 C CNN
+F 4 "RND 205-00001" H 0   0   50  0001 C CNN "Reichelt"
+	1    8800 2400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2150 1800 2350 1800
+Wire Wire Line
+	1450 1650 1550 1650
+Wire Wire Line
+	1550 1650 1550 1800
+Wire Wire Line
+	1550 1800 1850 1800
+Wire Wire Line
+	1450 1550 1550 1550
+Wire Wire Line
+	1550 1550 1550 1400
+Wire Wire Line
+	1550 1400 2350 1400
+Wire Wire Line
+	2850 1400 2850 1300
+Wire Wire Line
+	2850 1300 3250 1300
+Wire Wire Line
+	2750 1400 2850 1400
+Wire Wire Line
+	2750 1800 2850 1800
+Wire Wire Line
+	2850 1800 2850 1900
+Wire Wire Line
+	2850 1900 3250 1900
+$Comp
+L power:GND #PWR0101
+U 1 1 5BA707D7
+P 2950 2150
+F 0 "#PWR0101" H 2950 1900 50  0001 C CNN
+F 1 "GND" H 2955 1977 50  0000 C CNN
+F 2 "" H 2950 2150 50  0001 C CNN
+F 3 "" H 2950 2150 50  0001 C CNN
+	1    2950 2150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4150 1750 4150 1600
+Connection ~ 4150 1600
+Wire Wire Line
+	4150 1600 4400 1600
+$Comp
+L power:GND #PWR0102
+U 1 1 5BA71045
+P 4150 2150
+F 0 "#PWR0102" H 4150 1900 50  0001 C CNN
+F 1 "GND" H 4155 1977 50  0000 C CNN
+F 2 "" H 4150 2150 50  0001 C CNN
+F 3 "" H 4150 2150 50  0001 C CNN
+	1    4150 2150
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0103
+U 1 1 5BA71153
+P 4700 2150
+F 0 "#PWR0103" H 4700 1900 50  0001 C CNN
+F 1 "GND" H 4705 1977 50  0000 C CNN
+F 2 "" H 4700 2150 50  0001 C CNN
+F 3 "" H 4700 2150 50  0001 C CNN
+	1    4700 2150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5000 1600 5300 1600
+Wire Wire Line
+	5300 1600 5300 1750
+$Comp
+L power:GND #PWR0104
+U 1 1 5BA71675
+P 5300 2150
+F 0 "#PWR0104" H 5300 1900 50  0001 C CNN
+F 1 "GND" H 5305 1977 50  0000 C CNN
+F 2 "" H 5300 2150 50  0001 C CNN
+F 3 "" H 5300 2150 50  0001 C CNN
+	1    5300 2150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4150 2050 4150 2150
+Wire Wire Line
+	4700 1900 4700 2150
+Wire Wire Line
+	5300 2050 5300 2150
+Wire Wire Line
+	2950 1600 2950 2150
+Wire Wire Line
+	3550 1600 4150 1600
+$Comp
+L Connector_Generic:Conn_01x05 J4
+U 1 1 5BA74CF6
+P 8800 3400
+F 0 "J4" H 8880 3442 50  0000 L CNN
+F 1 "ISP" H 8880 3351 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical" H 8800 3400 50  0001 C CNN
+F 3 "~" H 8800 3400 50  0001 C CNN
+	1    8800 3400
+	1    0    0    -1  
+$EndComp
+Text Label 8350 3200 0    50   ~ 0
+RST#
+Wire Wire Line
+	8600 3300 8350 3300
+Wire Wire Line
+	8600 3400 8350 3400
+Wire Wire Line
+	8600 3500 8350 3500
+Text Label 8350 3500 0    50   ~ 0
+MISO
+Text Label 8350 3400 0    50   ~ 0
+MOSI
+Text Label 8350 3300 0    50   ~ 0
+SCK
+Entry Wire Line
+	8250 3100 8350 3200
+Entry Wire Line
+	8250 3200 8350 3300
+Entry Wire Line
+	8250 3300 8350 3400
+Entry Wire Line
+	8250 3400 8350 3500
+Text Label 8000 3000 0    50   ~ 0
+PROG
+$Comp
+L Device:R R2
+U 1 1 5BA766EC
+P 1950 2700
+F 0 "R2" V 1743 2700 50  0000 C CNN
+F 1 "330" V 1834 2700 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" V 1880 2700 50  0001 C CNN
+F 3 "~" H 1950 2700 50  0001 C CNN
+F 4 "VI MBB02070C3300" V 1950 2700 50  0001 C CNN "Reichelt"
+	1    1950 2700
+	0    -1   1    0   
+$EndComp
+Wire Wire Line
+	2100 2700 2200 2700
+Wire Wire Line
+	1700 2800 1700 2700
+Wire Wire Line
+	1400 2700 1700 2700
+Wire Wire Line
+	1700 3100 1700 3200
+Wire Wire Line
+	1500 3200 1700 3200
+Wire Wire Line
+	1500 3200 1500 2800
+Wire Wire Line
+	1400 2800 1500 2800
+$Comp
+L Connector_Generic:Conn_01x04 J5
+U 1 1 5BA7851E
+P 8800 4400
+F 0 "J5" H 8880 4392 50  0000 L CNN
+F 1 "Display" H 8880 4301 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical" H 8800 4400 50  0001 C CNN
+F 3 "~" H 8800 4400 50  0001 C CNN
+	1    8800 4400
+	1    0    0    -1  
+$EndComp
+Text Label 8350 4400 0    50   ~ 0
+SDA
+Entry Wire Line
+	8250 4200 8350 4300
+Entry Wire Line
+	8250 4300 8350 4400
+Text Label 7950 4100 0    50   ~ 0
+DISPLAY
+Wire Wire Line
+	8350 3200 8600 3200
+$Comp
+L Device:R R1
+U 1 1 5BA7E142
+P 3050 2700
+F 0 "R1" V 2843 2700 50  0000 C CNN
+F 1 "330" V 2934 2700 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" V 2980 2700 50  0001 C CNN
+F 3 "~" H 3050 2700 50  0001 C CNN
+F 4 "VI MBB02070C3300" V 3050 2700 50  0001 C CNN "Reichelt"
+	1    3050 2700
+	0    -1   1    0   
+$EndComp
+$Comp
+L power:GND #PWR0105
+U 1 1 5BA7E1B9
+P 2900 3000
+F 0 "#PWR0105" H 2900 2750 50  0001 C CNN
+F 1 "GND" H 2905 2827 50  0000 C CNN
+F 2 "" H 2900 3000 50  0001 C CNN
+F 3 "" H 2900 3000 50  0001 C CNN
+	1    2900 3000
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:VCC #PWR0106
+U 1 1 5BA7E5BD
+P 5600 1600
+F 0 "#PWR0106" H 5600 1450 50  0001 C CNN
+F 1 "VCC" H 5617 1773 50  0000 C CNN
+F 2 "" H 5600 1600 50  0001 C CNN
+F 3 "" H 5600 1600 50  0001 C CNN
+	1    5600 1600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5300 1600 5600 1600
+Connection ~ 5300 1600
+$Comp
+L power:GND #PWR0107
+U 1 1 5BA7EDC4
+P 4900 5400
+F 0 "#PWR0107" H 4900 5150 50  0001 C CNN
+F 1 "GND" H 4905 5227 50  0000 C CNN
+F 2 "" H 4900 5400 50  0001 C CNN
+F 3 "" H 4900 5400 50  0001 C CNN
+	1    4900 5400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4900 5300 4900 5400
+$Comp
+L power:VCC #PWR0108
+U 1 1 5BA7F5BC
+P 4900 4000
+F 0 "#PWR0108" H 4900 3850 50  0001 C CNN
+F 1 "VCC" H 4917 4173 50  0000 C CNN
+F 2 "" H 4900 4000 50  0001 C CNN
+F 3 "" H 4900 4000 50  0001 C CNN
+	1    4900 4000
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:VCC #PWR0109
+U 1 1 5BA7F5FA
+P 2000 6700
+F 0 "#PWR0109" H 2000 6550 50  0001 C CNN
+F 1 "VCC" H 2017 6873 50  0000 C CNN
+F 2 "" H 2000 6700 50  0001 C CNN
+F 3 "" H 2000 6700 50  0001 C CNN
+	1    2000 6700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0110
+U 1 1 5BA7F627
+P 2000 7200
+F 0 "#PWR0110" H 2000 6950 50  0001 C CNN
+F 1 "GND" H 2005 7027 50  0000 C CNN
+F 2 "" H 2000 7200 50  0001 C CNN
+F 3 "" H 2000 7200 50  0001 C CNN
+	1    2000 7200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2000 6700 2000 6800
+Wire Wire Line
+	2000 7100 2000 7200
+Wire Wire Line
+	4900 4000 4900 4100
+Wire Wire Line
+	3300 2700 3200 2700
+Wire Wire Line
+	2800 2900 2900 2900
+Wire Wire Line
+	2900 2900 2900 3000
+Text GLabel 3300 2700 2    50   Input ~ 0
+OUT
+Wire Wire Line
+	2900 2700 2800 2700
+$Comp
+L Device:R R3
+U 1 1 5BA85796
+P 8500 2150
+F 0 "R3" H 8570 2196 50  0000 L CNN
+F 1 "1k" H 8570 2105 50  0000 L CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" V 8430 2150 50  0001 C CNN
+F 3 "~" H 8500 2150 50  0001 C CNN
+F 4 "MPR 1,00K" H 8500 2150 50  0001 C CNN "Reichelt"
+	1    8500 2150
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0111
+U 1 1 5BA85891
+P 8500 2600
+F 0 "#PWR0111" H 8500 2350 50  0001 C CNN
+F 1 "GND" H 8505 2427 50  0000 C CNN
+F 2 "" H 8500 2600 50  0001 C CNN
+F 3 "" H 8500 2600 50  0001 C CNN
+	1    8500 2600
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:VCC #PWR0112
+U 1 1 5BA858C0
+P 8500 1900
+F 0 "#PWR0112" H 8500 1750 50  0001 C CNN
+F 1 "VCC" H 8517 2073 50  0000 C CNN
+F 2 "" H 8500 1900 50  0001 C CNN
+F 3 "" H 8500 1900 50  0001 C CNN
+	1    8500 1900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8500 1900 8500 2000
+Wire Wire Line
+	8500 2300 8500 2400
+Wire Wire Line
+	8500 2400 8600 2400
+Wire Wire Line
+	8500 2600 8500 2500
+Wire Wire Line
+	8500 2500 8600 2500
+Wire Wire Line
+	8500 2400 8400 2400
+Connection ~ 8500 2400
+Text GLabel 8400 2400 0    50   Output ~ 0
+AIN
+$Comp
+L Connector_Generic:Conn_01x03 J6
+U 1 1 5BA8B2A0
+P 8800 5400
+F 0 "J6" H 8880 5442 50  0000 L CNN
+F 1 "UART" H 8880 5351 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 8800 5400 50  0001 C CNN
+F 3 "~" H 8800 5400 50  0001 C CNN
+	1    8800 5400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8600 5300 8350 5300
+Wire Wire Line
+	8600 5400 8350 5400
+Text Label 8350 5400 0    50   ~ 0
+RX
+Text Label 8350 5300 0    50   ~ 0
+TX
+Entry Wire Line
+	8250 5200 8350 5300
+Entry Wire Line
+	8250 5300 8350 5400
+Text Label 8000 5100 0    50   ~ 0
+UART
+Text GLabel 5700 4900 2    50   Input ~ 0
+RST#
+Text GLabel 5700 4400 2    50   Input ~ 0
+MOSI_SDA_RX
+Wire Wire Line
+	5500 4900 5700 4900
+Text GLabel 5700 4500 2    50   Output ~ 0
+MISO_TX
+Text GLabel 5700 4600 2    50   Output ~ 0
+SCK_SCL
+Text GLabel 5700 4700 2    50   Input ~ 0
+AIN
+Text GLabel 5700 4800 2    50   Output ~ 0
+OUT
+Wire Wire Line
+	5500 4800 5700 4800
+Wire Wire Line
+	5700 4700 5500 4700
+Wire Wire Line
+	5500 4600 5700 4600
+Wire Wire Line
+	5700 4500 5500 4500
+Wire Wire Line
+	5500 4400 5700 4400
+Text GLabel 7600 3400 0    50   Output ~ 0
+MOSI_SDA_RX
+Text GLabel 7600 3500 0    50   Input ~ 0
+MISO_TX
+Text GLabel 7600 3300 0    50   Output ~ 0
+SCK_SCL
+Text GLabel 7600 3200 0    50   Output ~ 0
+RST#
+Entry Wire Line
+	7850 3200 7950 3100
+Entry Wire Line
+	7850 3300 7950 3200
+Entry Wire Line
+	7850 3400 7950 3300
+Entry Wire Line
+	7850 3500 7950 3400
+Wire Bus Line
+	7950 3000 8250 3000
+Wire Wire Line
+	7600 3200 7850 3200
+Wire Wire Line
+	7600 3300 7850 3300
+Wire Wire Line
+	7600 3400 7850 3400
+Wire Wire Line
+	7600 3500 7850 3500
+Wire Wire Line
+	8500 3600 8500 3700
+Text Label 7850 3200 2    50   ~ 0
+RST#
+Text Label 7850 3300 2    50   ~ 0
+SCK
+Text Label 7850 3400 2    50   ~ 0
+MOSI
+Text Label 7850 3500 2    50   ~ 0
+MISO
+$Comp
+L power:GND #PWR0113
+U 1 1 5BABA282
+P 8500 3700
+F 0 "#PWR0113" H 8500 3450 50  0001 C CNN
+F 1 "GND" H 8505 3527 50  0000 C CNN
+F 2 "" H 8500 3700 50  0001 C CNN
+F 3 "" H 8500 3700 50  0001 C CNN
+	1    8500 3700
+	1    0    0    -1  
+$EndComp
+Text GLabel 7600 4400 0    50   Output ~ 0
+MOSI_SDA_RX
+Text GLabel 7600 4300 0    50   Output ~ 0
+SCK_SCL
+Entry Wire Line
+	7850 4300 7950 4200
+Entry Wire Line
+	7850 4400 7950 4300
+Wire Wire Line
+	8100 4600 8100 4700
+$Comp
+L power:GND #PWR0114
+U 1 1 5BAC1E8A
+P 8100 4700
+F 0 "#PWR0114" H 8100 4450 50  0001 C CNN
+F 1 "GND" H 8105 4527 50  0000 C CNN
+F 2 "" H 8100 4700 50  0001 C CNN
+F 3 "" H 8100 4700 50  0001 C CNN
+	1    8100 4700
+	1    0    0    -1  
+$EndComp
+Text Label 8350 4300 0    50   ~ 0
+SCL
+Text Label 7850 4300 2    50   ~ 0
+SCL
+Text Label 7850 4400 2    50   ~ 0
+SDA
+$Comp
+L power:VCC #PWR0115
+U 1 1 5BACAA5C
+P 8100 4400
+F 0 "#PWR0115" H 8100 4250 50  0001 C CNN
+F 1 "VCC" H 8117 4573 50  0000 C CNN
+F 2 "" H 8100 4400 50  0001 C CNN
+F 3 "" H 8100 4400 50  0001 C CNN
+	1    8100 4400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8500 3600 8600 3600
+Wire Wire Line
+	8100 4400 8100 4500
+Wire Wire Line
+	8100 4500 8600 4500
+Wire Wire Line
+	8100 4600 8600 4600
+Wire Bus Line
+	7950 4100 8250 4100
+Wire Wire Line
+	8500 5500 8500 5600
+$Comp
+L power:GND #PWR0116
+U 1 1 5BAE1CB4
+P 8500 5600
+F 0 "#PWR0116" H 8500 5350 50  0001 C CNN
+F 1 "GND" H 8505 5427 50  0000 C CNN
+F 2 "" H 8500 5600 50  0001 C CNN
+F 3 "" H 8500 5600 50  0001 C CNN
+	1    8500 5600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8500 5500 8600 5500
+Text GLabel 7700 5400 0    50   Output ~ 0
+MOSI_SDA_RX
+Text GLabel 7700 5300 0    50   Input ~ 0
+MISO_TX
+Entry Wire Line
+	7850 5400 7950 5300
+Entry Wire Line
+	7850 5300 7950 5200
+Wire Wire Line
+	7700 5300 7850 5300
+Wire Wire Line
+	7700 5400 7850 5400
+Text Label 7850 5400 2    50   ~ 0
+RX
+Text Label 7850 5300 2    50   ~ 0
+TX
+Wire Bus Line
+	7950 5100 8250 5100
+$Comp
+L Mechanical:MountingHole MH1
+U 1 1 5BB01758
+P 1150 6550
+F 0 "MH1" H 1250 6550 50  0000 L CNN
+F 1 "MountingHole" H 1250 6505 50  0001 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 1150 6550 50  0001 C CNN
+F 3 "~" H 1150 6550 50  0001 C CNN
+	1    1150 6550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:MountingHole MH2
+U 1 1 5BB018AC
+P 1150 6800
+F 0 "MH2" H 1250 6800 50  0000 L CNN
+F 1 "MountingHole" H 1250 6755 50  0001 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 1150 6800 50  0001 C CNN
+F 3 "~" H 1150 6800 50  0001 C CNN
+	1    1150 6800
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:MountingHole MH3
+U 1 1 5BB018EC
+P 1150 7050
+F 0 "MH3" H 1250 7050 50  0000 L CNN
+F 1 "MountingHole" H 1250 7005 50  0001 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 1150 7050 50  0001 C CNN
+F 3 "~" H 1150 7050 50  0001 C CNN
+	1    1150 7050
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:MountingHole MH4
+U 1 1 5BB0193E
+P 1150 7300
+F 0 "MH4" H 1250 7300 50  0000 L CNN
+F 1 "MountingHole" H 1250 7255 50  0001 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 1150 7300 50  0001 C CNN
+F 3 "~" H 1150 7300 50  0001 C CNN
+	1    1150 7300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2200 2900 1950 2900
+Wire Wire Line
+	1950 2900 1950 3050
+Wire Wire Line
+	1950 3050 1850 3050
+Connection ~ 1700 2700
+Wire Wire Line
+	1700 2700 1800 2700
+Wire Notes Line
+	2550 1000 2550 3450
+Text Notes 2400 1100 2    98   ~ 0
+Hot side
+Wire Wire Line
+	7600 4400 7850 4400
+Wire Wire Line
+	7600 4300 7850 4300
+Wire Wire Line
+	8600 4300 8350 4300
+Wire Wire Line
+	8600 4400 8350 4400
+$Comp
+L Regulator_Linear:LP2950-5.0_TO92 U2
+U 1 1 5BB9A0B4
+P 4700 1600
+F 0 "U2" H 4700 1842 50  0000 C CNN
+F 1 "LP2950-5.0_TO92" H 4700 1751 50  0000 C CNN
+F 2 "Package_TO_SOT_THT:TO-92_Inline" H 4700 1825 50  0001 C CIN
+F 3 "http://www.ti.com/lit/ds/symlink/lp2950-n.pdf" H 4700 1550 50  0001 C CNN
+F 4 "LP 2950 ACZ5,0" H 4700 1600 50  0001 C CNN "Reichelt"
+	1    4700 1600
+	1    0    0    -1  
+$EndComp
+$Comp
+L MCU_Microchip_ATtiny:ATtiny45-20PU U1
+U 1 1 5BB9B0B7
+P 4900 4700
+F 0 "U1" H 4370 4746 50  0000 R CNN
+F 1 "ATtiny45-20PU" H 4370 4655 50  0000 R CNN
+F 2 "Package_DIP:DIP-8_W7.62mm" H 4900 4700 50  0001 C CIN
+F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/atmel-2586-avr-8-bit-microcontroller-attiny25-attiny45-attiny85_datasheet.pdf" H 4900 4700 50  0001 C CNN
+F 4 "ATTINY 45-20PU" H 4900 4700 50  0001 C CNN "Reichelt"
+	1    4900 4700
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:Heatsink_Pad HS1
+U 1 1 5BAFABCC
+P 1150 6050
+F 0 "HS1" V 1103 6180 50  0000 L CNN
+F 1 "Heatsink" V 1194 6180 50  0000 L CNN
+F 2 "Heatsink:Heatsink_35x26mm_1xFixation3mm_Fischer-SK486-35" H 1162 6000 50  0001 C CNN
+F 3 "~" H 1162 6000 50  0001 C CNN
+F 4 "576802B03100G" H 1150 6050 50  0001 C CNN "Reichelt"
+	1    1150 6050
+	0    1    1    0   
+$EndComp
+Wire Bus Line
+	8250 5100 8250 5300
+Wire Bus Line
+	8250 4100 8250 4300
+Wire Bus Line
+	7950 5100 7950 5300
+Wire Bus Line
+	7950 4100 7950 4300
+Wire Bus Line
+	8250 3000 8250 3400
+Wire Bus Line
+	7950 3000 7950 3400
+$EndSCHEMATC
