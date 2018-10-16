@@ -7,6 +7,7 @@
 #include <util/atomic.h>
 
 #include "usi.h"
+#include "config.h"
 
 #define ADC_VAL(x) (0x1000UL * (x) / ((x) + 1000))
 static const struct {
@@ -198,82 +199,6 @@ static void blink_errorcode(uint8_t code)
 	}
 }
 
-enum config_param {
-	CONFIG_KP,
-	CONFIG_KI,
-	CONFIG_KD,
-	CONFIG_I_MIN,
-	CONFIG_I_MAX,
-	CONFIG_SET_POINT,
-	CONFIG_BAND,
-	CONFIG_SAMPLE_TIME,
-	CONFIG_AUTO_OFF_TIME,
-};
-
-static const char config_param_name[] PROGMEM = {
-	[CONFIG_KP]            = 'P',
-	[CONFIG_KI]            = 'I',
-	[CONFIG_KD]            = 'D',
-	[CONFIG_I_MIN]         = 'm',
-	[CONFIG_I_MAX]         = 'M',
-	[CONFIG_SET_POINT]     = 'S',
-	[CONFIG_BAND]          = 'B',
-	[CONFIG_SAMPLE_TIME]   = 'T',
-	[CONFIG_AUTO_OFF_TIME] = 'O',
-};
-
-static int8_t config_find_by_name(const char name)
-{
-	uint8_t i;
-	for (i = 0; i < sizeof(config_param_name); i++) {
-		if (pgm_read_byte(&(config_param_name[i])) == name)
-			return i;
-	}
-	return -1;
-}
-
-struct config {
-	uint8_t version;
-	int16_t kp;
-	int16_t ki;
-	int16_t kd;
-	int32_t i_min;
-	int32_t i_max;
-	int16_t set_point;
-	int16_t band;
-	uint16_t sample_time_ms;
-	uint16_t off_time;
-} __attribute__((packed));
-
-struct config _config = {
-	1, 0.75 * 32, 0.15 * 32, 0, 150, 1000, 100, 0
-}, *config = &_config;
-
-#define PID_SCALING_FACTOR 32
-
-static void dump_pid_scale_u16(enum config_param p, uint16_t val)
-{
-	float d = (float)val / PID_SCALING_FACTOR;
-	printf("%c%d.%d\r\n", pgm_read_byte(&(config_param_name[p])), (int)d, (int)(d * 1000) % 1000);
-}
-
-static void dump_config(void)
-{
-	/*
-	 * P Kp
-	 * I Ki
-	 * D Kd
-	 * O auto off time
-	 * B controlling range (band)
-	 * S set point (target temperature)
-	 * T sample time
-	 */
-
-	dump_pid_scale_u16(CONFIG_KP, config->kp);
-	dump_pid_scale_u16(CONFIG_KI, config->ki);
-	dump_pid_scale_u16(CONFIG_KD, config->kd);
-}
-
 static FILE uart_stdout = FDEV_SETUP_STREAM(uart_putc, NULL,
 		_FDEV_SETUP_WRITE);
 
@@ -396,8 +321,8 @@ int main(void)
 		if (uptime != last_uptime) {
 			last_uptime = uptime;
 			printf_P(PSTR("Hello World (%02x) (%d/%d)\r\n"), uart_getc(), cli_enabled, display_enabled);
-			dump_config();
 			display_degc((degc + 5) / 10);
+			config_dump();
 		}
 
 		degc = adc2degc(adc_get());
