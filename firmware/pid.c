@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include "pid.h"
 
+#undef UT_ENABLED
+
 struct pid {
 	int16_t p_gain;
 	int16_t i_gain;
@@ -109,7 +111,9 @@ int16_t pid_update(int16_t error, int16_t position)
 
 	ret = (p + i + d) >> PID_SCALING_SHIFT;
 
-	//printf("PID %d %f %f %f ret=%ld\r\n", error, (float)p/32, (float)i/32, (float)d/32, ret);
+#ifdef UT_ENABLED
+	printf("PID error=%d p=%f i=%f d=%f ret=%d\r\n", error, (float)p/1024, (float)i/1024, (float)d/1024, ret);
+#endif
 	if (ret > INT16_MAX)
 		ret = INT16_MAX;
 	else if (ret < INT16_MIN)
@@ -118,3 +122,44 @@ int16_t pid_update(int16_t error, int16_t position)
 	//pid->out_last = ret;
 	return ret;
 }
+
+#ifdef UT_ENABLED
+static float val = 200;
+static int16_t read_val()
+{
+	return val;
+}
+static void drive_val(int16_t drive)
+{
+	static float last = 0;
+	if (drive > 200)
+		drive = 200;
+	else if (drive < 0)
+		drive = 0;
+
+	/* delay line */
+	val += last;
+
+	last = drive * 0.1;
+
+	val -= 0.4;
+}
+
+int main(void)
+{
+	int i = 0;
+	int16_t position;
+	int16_t setpoint = 1050;
+	int16_t drive;
+
+#define k (1 << PID_SCALING_SHIFT)
+	pid_init(0.75 * k, 0.1 * k, 0.00 * k, 0, 200, 100);
+
+	while(i++ < 1000) {
+		position = read_val();
+		drive = pid_update(setpoint - position, position);
+		drive_val(drive);
+		printf("%03i drive=%d position=%d\n", i, drive, position);
+	}
+}
+#endif
