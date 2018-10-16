@@ -9,6 +9,8 @@
 #include "usi.h"
 #include "config.h"
 
+#define VERSION "0.1"
+
 #define ADC_VAL(x) (0x1000UL * (x) / ((x) + 1000))
 static const struct {
 	const int16_t t;
@@ -316,6 +318,8 @@ int main(void)
 
 	stdout = &uart_stdout;
 	sei();
+
+	uart_puts_P(PSTR("minipid v" VERSION "\n"));
 
 	while (true) {
 		if (uptime != last_uptime) {
