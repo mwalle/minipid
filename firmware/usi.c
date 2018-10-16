@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
 #include <util/delay.h>
 #include <util/atomic.h>
 
@@ -130,8 +131,11 @@ ISR(USI_OVF_vect)
 	}
 }
 
-void uart_putc(char c)
+void uart_putc(const char c)
 {
+	if (c == '\n')
+		uart_putc('\r');
+
 	usi_aquire(USI_UART_TX1);
 
 	uart_tx_char = swapb(c);
@@ -153,6 +157,19 @@ void uart_putc(char c)
 
 	/* now start the timer, everything else will be interrupt driven */
 	timer0_start(TIMER0_BIT_CNT);
+}
+
+void uart_puts(const char *s)
+{
+	while (*s)
+		uart_putc(*(s++));
+}
+
+void uart_puts_P(const char *s)
+{
+	char c;
+	while ((c = pgm_read_byte(s++)))
+		uart_putc(c);
 }
 
 char uart_getc(void)
