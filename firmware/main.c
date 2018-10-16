@@ -320,7 +320,7 @@ int main(void)
 	while (true) {
 		if (uptime != last_uptime) {
 			last_uptime = uptime;
-			printf_P(PSTR("Hello World (%02x) (%d/%d)\r\n"), uart_getc(), cli_enabled, display_enabled);
+			//printf_P(PSTR("Hello World (%02x) (%d/%d)\r\n"), uart_getc(), cli_enabled, display_enabled);
 			display_degc((degc + 5) / 10);
 			config_dump();
 		}

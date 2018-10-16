@@ -10,7 +10,7 @@ F_CPU = 8000000
 
 OBJECTS=$(SOURCES:.c=.o)
 CFLAGS=-g -Os -Wall -DF_CPU=$(F_CPU)
-LDFLAGS=-g -Wl,-u,vfprintf -lprintf_min
+LDFLAGS=
 
 all: hex eeprom
 
