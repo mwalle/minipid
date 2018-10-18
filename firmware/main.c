@@ -240,16 +240,15 @@ int main(void)
 			config_dump();
 		}
 
+		error = config->set_point - degc;
+		out = pid_update(error, degc);
+		if (out > 200) {
+			out = 200;
+		} else if (out < 0) {
+			out = 0;
+		}
+		pwm_set(out);
 	}
-
-	error = config->set_point - degc;
-	out = pid_update(error, degc);
-	if (out > 200) {
-		out = 200;
-	} else if (out < 0) {
-		out = 0;
-	}
-	pwm_set(out);
 
 	return 0;
 }
