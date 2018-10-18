@@ -5,7 +5,7 @@
 
 #include "adc.h"
 
-#define ADC_VAL(x) (0x1000UL * (x) / ((x) + 1000))
+#define ADC_VAL(x) (0x2000UL * (x) / ((x) + 1000))
 static const struct {
 	const int16_t t;
 	const uint16_t v;
@@ -103,11 +103,11 @@ void adc_init(void)
 	 * ADC setup
 	 *
 	 * - Aref is AVcc
-	 * - AIN is ADC1
+	 * - AIN is ADC3
 	 * - 128 prescaler ^= 62.5 kHz
 	 * */
-	ADMUX = 1;
-	DIDR0 = _BV(ADC1D);
+	ADMUX = 3;
+	DIDR0 = _BV(ADC3D);
 	ADCSRA = _BV(ADEN) | _BV(ADATE) | _BV(ADIE) | _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0);
 
 	/* start ADC */

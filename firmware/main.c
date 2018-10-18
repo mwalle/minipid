@@ -20,8 +20,8 @@ static void pwm_set(uint8_t steps)
 static void pwm_init(void)
 {
 	pwm_steps = 0;
-	PORTA &= _BV(PA3);
-	DDRA |= _BV(PA3);
+	PORTB &= _BV(PB4);
+	DDRB |= _BV(PB4);
 }
 
 static uint16_t uptime;
@@ -31,9 +31,9 @@ ISR(TIM1_COMPA_vect)
 
 	/* only set the pwm output of the beginning of the cycle */
 	if (pwm_steps && cycle == 0)
-		PORTA |= _BV(PA3);
+		PORTB |= _BV(PB4);
 	else if (cycle >= pwm_steps)
-		PORTA &= ~_BV(PA3);
+		PORTB &= ~_BV(PB4);
 
 	if (cycle == 100 || cycle == 200)
 		uptime++;
@@ -45,20 +45,24 @@ ISR(TIM1_COMPA_vect)
 static void timer1_init(void)
 {
 	/*
-	 * Setup Timer1 to 10ms.
+	 * Setup Timer1 to 10ms (actually 9.98ms).
 	 *
-	 * The system clock is 8 MHz, use the 64 prescaler and a counter
-	 * value of 1250.
+	 * The system clock is 8 MHz, use the 512 prescaler and a counter
+	 * value of 156.
 	 *
 	 */
-	/* CTC mode, prescaler to 64 */
-	TCCR1A = 0;
-	TCCR1B = _BV(WGM12) | _BV(CS11) | _BV(CS10);
-	OCR1AH = (F_CPU / 64 / 100) >> 8;
-	OCR1AL = (F_CPU / 64 / 100) & 0xff;
+	/* CTC mode, prescaler to 512 */
+	TCCR1 = _BV(CTC1) | _BV(CS13) | _BV(CS11);
+	OCR1A = (F_CPU / 512 / 100);
+	OCR1C = (F_CPU / 512 / 100);
 
 	/* enable timer interrupt */
-	TIMSK1 = _BV(OCIE1A);
+	TIMSK |= _BV(OCIE1A);
+}
+
+static void timer1_stop(void)
+{
+	TCCR1 = 0;
 }
 
 enum {
@@ -69,26 +73,31 @@ static void blink_errorcode(uint8_t code) __attribute__((noreturn));
 static void blink_errorcode(uint8_t code)
 {
 	int i;
+
 	/* turn output off */
-	PORTB &= ~_BV(PB2);
+	timer1_stop();
+	PORTB &= ~_BV(PB4);
 
 	while (true) {
 		/* two short blinks */
-		PORTB |= _BV(PB2);
-		_delay_ms(25);
-		PORTB &= ~_BV(PB2);
-		_delay_ms(500);
-
-		/* error code */
-		for (i=0; i<code; i++) {
-			PORTB |= _BV(PB2);
-			_delay_ms(25);
-			PORTB &= ~_BV(PB2);
-			_delay_ms(200);
+		for (i = 0; i < 2; i++) {
+			PORTB |= _BV(PB4);
+			_delay_ms(50);
+			PORTB &= ~_BV(PB4);
+			_delay_ms(300);
 		}
 
-		/* 5s pause */
-		_delay_ms(5000);
+		_delay_ms(500);
+		/* error code */
+		for (i = 0; i < code; i++) {
+			PORTB |= _BV(PB4);
+			_delay_ms(100);
+			PORTB &= ~_BV(PB4);
+			_delay_ms(500);
+		}
+
+		/* 10s pause */
+		_delay_ms(10000);
 	}
 }
 
@@ -166,17 +175,14 @@ int main(void)
 	int16_t error;
 	uint16_t out;
 
-	/* XXX remove me probe pin */
-	DDRB |= _BV(PB2);
-	PORTB &= ~_BV(PB2);
 
 	/*
-	 * We have three cases for PA4 (SCL) and PA6 (SDA/UART_DI).
+	 * We have three cases for PB2 (SCL) and PB0 (SDA/UART_DI).
 	 *
 	 * If I2C is connected, there will be a pull-up on both lines. If UART is
 	 * connected the UART_DI will be high because it is the default line state.
 	 *
-	 * | PA4  | PA6  | Description                                                |
+	 * | PB2  | PB0  | Description                                                |
 	 * +------+------+------------------------------------------------------------+
 	 * | low  | low  | Nothin is connected. Disable display and cli are disabled. |
 	 * | high | high | I2C is connected. Enable display.                          |
@@ -184,16 +190,16 @@ int main(void)
 	 * | high | low  | Invalid state. Turn off, display error.                    |
 	 */
 
-	switch (PINA & (_BV(PA4) | _BV(PA6))) {
+	switch (PINB & (_BV(PB2) | _BV(PB0))) {
 	case 0:
 		break;
-	case _BV(PA4):
+	case _BV(PB2):
 		blink_errorcode(ERROR_INVALID_SDA_SCL_STATE);
 		break;
-	case _BV(PA6):
+	case _BV(PB0):
 		cli_enabled = true;
 		break;
-	case _BV(PA4) | _BV(PA6):
+	case _BV(PB2) | _BV(PB0):
 		display_enabled = true;
 		break;
 	}

@@ -1,6 +1,6 @@
 TARGET = minipid
-MCU = attiny44
-PMCU = t44
+MCU = attiny85
+PMCU = t85
 SOURCES = main.c usi.c pid.c config.c adc.c
 
 PROGRAMMER = buspirate

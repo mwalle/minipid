@@ -59,16 +59,16 @@ ISR(TIM0_OVF_vect)
 
 static inline void timer0_start(uint8_t cnt)
 {
-	TIFR0 = _BV(TOV0); /* clear pending interrupt */
+	TIFR = _BV(TOV0); /* clear pending interrupt */
 	TCNT0 = 256 - cnt;
-	GTCCR |= _BV(PSR10);
+	GTCCR |= _BV(PSR0);
 	TCCR0A = 0;
 	TCCR0B = _BV(CS01); /* start Timer0, clk/8 prescaler */
 }
 
 static inline void timer0_stop(void)
 {
-	TIFR0 = _BV(TOV0);
+	TIFR = _BV(TOV0);
 	TCCR0A = 0;
 	TCCR0B = 0; /* stop Timer0 */
 }
@@ -83,12 +83,10 @@ ISR(PCINT0_vect)
 		return;
 
 	/* uart start bit detected */
-	if (!(PINA & _BV(PA6))) {
+	if (!(PINB & _BV(PB0))) {
 
 		/* Start the counter to hit the middle of the start bit */
 		timer0_start(TIMER0_BIT_CNT / 2 - 5);
-
-		PORTB |= _BV(PB2); /* XXX remove me */
 
 		/* enable USI in three wire mode and timer0 as clock source */
 		USICR = _BV(USIOIE) | _BV(USIWM0) | _BV(USICS0);
@@ -98,7 +96,7 @@ ISR(PCINT0_vect)
 		USISR = _BV(USIOIF) | USICNT(9);
 
 		/* mask any further pin change interrupts */
-		PCMSK0 &= ~_BV(PCINT6);
+		PCMSK &= ~_BV(PCINT0);
 
 		usi_state = USI_UART_RX;
 	}
@@ -117,16 +115,15 @@ ISR(USI_OVF_vect)
 	case USI_UART_RX:
 		uart_rx_char = swapb(USIDR);
 		/* reenable pin change interrupt again */
-		PCMSK0 |= _BV(PCINT6);
+		PCMSK |= _BV(PCINT0);
 		/* fall through */
 	case USI_UART_TX2:
 		/* put DO pin into input mode again */
-		PORTA |= _BV(PA5);
-		DDRA &= ~_BV(PA5);
+		PORTB |= _BV(PB1);
+		DDRB &= ~_BV(PB1);
 		timer0_stop();
 		usi_stop();
 		usi_release();
-		PORTB &= ~_BV(PB2); /* XXX remove me */
 		break;
 	}
 }
@@ -151,9 +148,7 @@ void uart_putc(const char c)
 	USIDR = 0x80 | uart_tx_char >> 2; /* idle bit, start bit, 6 data bits */
 
 	/* turn output on, should be high, because the msb in USIDR is 1 */
-	DDRA |= _BV(PA5);
-
-	PORTB &= ~_BV(PB2); /* XXX remove me */
+	DDRB |= _BV(PB1);
 
 	/* now start the timer, everything else will be interrupt driven */
 	timer0_start(TIMER0_BIT_CNT);
@@ -191,11 +186,11 @@ void twi_transfer(uint8_t *data, uint8_t len)
 	USIDR = 0xff;
 
 	/* enable ports */
-	DDRA |= _BV(PA4); /* SCL */
-	DDRA |= _BV(PA6); /* SDA */
+	DDRB |= _BV(PB2); /* SCL */
+	DDRB |= _BV(PB0); /* SDA */
 
 	/* start, scl will now held low automatically */
-	PORTA &= ~_BV(PA6);
+	PORTB &= ~_BV(PB0);
 
 	while (len--) {
 		uint8_t n = 7;
@@ -204,42 +199,42 @@ void twi_transfer(uint8_t *data, uint8_t len)
 		USIDR = *(data++);
 
 		/* first clock cycle */
-		PORTA &= ~_BV(PA4);  /* pull scl low */
-		PORTA |= _BV(PA6);   /* release sda */
+		PORTB &= ~_BV(PB2);  /* pull scl low */
+		PORTB |= _BV(PB0);   /* release sda */
 		USISR = _BV(USISIF); /* release automatic scl lock */
 		_delay_us(4);
 
-		PORTA |= _BV(PA4);   /* release scl */
+		PORTB |= _BV(PB2);   /* release scl */
 		_delay_us(4);
 
 		while (n--) {
-			PORTA &= ~_BV(PA4);
+			PORTB &= ~_BV(PB2);
 			PINB |= _BV(PB2);
 			_delay_us(4);
-			PORTA |= _BV(PA4);
+			PORTB |= _BV(PB2);
 			PINB |= _BV(PB2);
 			_delay_us(4);
 		}
 
-		PORTA &= ~_BV(PA4);
+		PORTB &= ~_BV(PB2);
 		_delay_us(4);
 
 		/* make sure USIDR doesn't pull SDA low, during ack cycle */
 		USIDR = 0xff;
 
-		PORTA |= _BV(PA4);
+		PORTB |= _BV(PB2);
 		_delay_us(4);
 
-		PORTA &= ~_BV(PA4);
+		PORTB &= ~_BV(PB2);
 		_delay_us(4);
 	}
 
 	/* stop */
-	PORTA &= ~_BV(PA6);
+	PORTB &= ~_BV(PB0);
 	_delay_us(4);
-	PORTA |= _BV(PA4);
+	PORTB |= _BV(PB2);
 	_delay_us(4);
-	PORTA |= _BV(PA6);
+	PORTB |= _BV(PB0);
 
 	usi_stop();
 	usi_release();
@@ -253,15 +248,15 @@ void twi_transfer(uint8_t *data, uint8_t len)
  */
 void uart_tx_twi_init(void)
 {
-	/* PA4 is SCL, PA6 is SDA and PA5 is UART_DO */
+	/* PB2 is SCL, PB0 is SDA and PB1 is UART_DO */
 
 	/* DO is input with pull-up if transmitter is disabled.
 	 * This is because the UART uses the three wire mode of the USE and we may
 	 * shift out low pulses if receiving data. */
-	PORTA |= _BV(PA5);
+	PORTB |= _BV(PB1);
 
 	/* enable overflow interrupt */
-	TIMSK0 |= _BV(TOIE0);
+	TIMSK |= _BV(TOIE0);
 	usi_state = USI_IDLE;
 }
 
@@ -273,21 +268,21 @@ void uart_tx_twi_init(void)
  */
 void uart_rx_tx_init(void)
 {
-	/* PA6 is UART_DI and PA5 is UART_DO */
+	/* PB0 is UART_DI and PB1 is UART_DO */
 
 	/* DO is input with pull-up if transmitter is disabled.
 	 * This is because the UART uses the three wire mode of the USI and we may
 	 * shift out low pulses if receiving data. */
-	PORTA |= _BV(PA5);
+	PORTB |= _BV(PB1);
 
 	/* DI is input with pull-up */
-	PORTA |= _BV(PA6);
+	PORTB |= _BV(PB0);
 
 	/* uart rx pin change interrupt */
-	PCMSK0 |= _BV(PCINT6);
-	GIMSK |= _BV(PCIE0);
+	PCMSK |= _BV(PCINT0);
+	GIMSK |= _BV(PCIE);
 
 	/* enable overflow interrupt */
-	TIMSK0 |= _BV(TOIE0);
+	TIMSK |= _BV(TOIE0);
 	usi_state = USI_IDLE;
 }
