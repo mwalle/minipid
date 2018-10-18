@@ -1,7 +1,7 @@
 TARGET = minipid
 MCU = attiny44
 PMCU = t44
-SOURCES = main.c usi.c pid.c config.c
+SOURCES = main.c usi.c pid.c config.c adc.c
 
 PROGRAMMER = buspirate
 PORT = /dev/ttyUSB0
