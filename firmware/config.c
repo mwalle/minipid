@@ -8,9 +8,7 @@
 #include "usi.h"
 #include "config.h"
 
-struct config _config = {
-	1, 0.75 * 1024, 0.15 * 1024, 0, 150, 1000, 100, 0
-}, *config = &_config;
+struct config _config, *config = &_config;
 
 static void dump_param_decpoint(char param, int16_t val_fp)
 {
@@ -55,6 +53,25 @@ static void dump_param(char param, int16_t val)
 	buf[0] = param;
 	itoa(val, buf + 1, 10);
 	uart_puts(buf);
+}
+
+static void config_init_default(void)
+{
+	config->version = 1;
+	config->kp = 0.75 * 1024;
+	config->ki = 0.00 * 1024;
+	config->kd = 0.00 * 1024;
+	config->i_min = 0;
+	config->i_max = 100;
+	config->set_point = 1000;
+	config->band = 100;
+	config->sample_time_ms = 100;
+	config->auto_off_time = 0;
+}
+
+void config_init(void)
+{
+	config_init_default();
 }
 
 void config_dump(void)

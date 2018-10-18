@@ -187,6 +187,7 @@ int main(void)
 	int16_t error;
 	int16_t out;
 
+	config_init();
 
 	/*
 	 * We have three cases for PB2 (SCL) and PB0 (SDA/UART_DI).
