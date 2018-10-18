@@ -2,30 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-
-#ifdef UT_ENABLED
-#include <stdio.h>
-#define PROGMEM
-#define pgm_read_byte(x) (*(x))
-
-char *itoa(int16_t val, char *s, int radix)
-{
-	sprintf(s, "%d", val);
-	return s;
-}
-
-void uart_putc(const char c)
-{
-	printf("%c", c);
-}
-
-void uart_puts(const char *s)
-{
-	printf("%s", s);
-}
-#else
 #include <avr/pgmspace.h>
-#endif
 
 #include "pid.h"
 #include "usi.h"
@@ -161,14 +138,3 @@ void config_scan_input(const char *str)
 	}
 
 }
-
-#ifdef UT_ENABLED
-int main(void)
-{
-	config_scan_input("P15.123");
-	printf("config->kp=%d\n", config->kp);
-
-	config_dump_config();
-	return 0;
-}
-#endif
