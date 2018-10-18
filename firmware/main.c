@@ -221,6 +221,7 @@ int main(void)
 	else
 		uart_tx_twi_init();
 
+	adc_init();
 	display_init();
 	pwm_init();
 	timer1_init();
