@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
+#include <stdlib.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
@@ -101,9 +103,6 @@ static void blink_errorcode(uint8_t code)
 	}
 }
 
-static FILE uart_stdout = FDEV_SETUP_STREAM(uart_putc, NULL,
-		_FDEV_SETUP_WRITE);
-
 static void display_init(void)
 {
 	uint8_t buf;
@@ -165,15 +164,28 @@ static void display_degc(uint8_t val)
 	twi_transfer(buf, 5);
 }
 
+static void print_statusline(int16_t degc, int16_t pwm)
+{
+	char buf[8];
+	uart_puts(itoa(uptime, buf, 10));
+	uart_puts_P(PSTR(" "));
+	uart_puts(itoa(degc / 10, buf, 10));
+	uart_puts_P(PSTR("."));
+	uart_puts(itoa(degc % 10, buf, 10));
+	uart_puts_P(PSTR(" "));
+	uart_puts(itoa(pwm, buf, 10));
+	uart_puts_P(PSTR("\n"));
+}
+
 int main(void)
 {
 	bool cli_enabled = false;
 	bool display_enabled = false;
 
 	uint16_t last_uptime = UINT16_MAX;
-	uint16_t degc;
+	int16_t degc;
 	int16_t error;
-	uint16_t out;
+	int16_t out;
 
 
 	/*
@@ -213,20 +225,19 @@ int main(void)
 	pwm_init();
 	timer1_init();
 
-	stdout = &uart_stdout;
 	sei();
 
 	uart_puts_P(PSTR("minipid v" VERSION "\n"));
 
 	while (true) {
+		degc = adc2degc(adc_get());
 		if (uptime != last_uptime) {
 			last_uptime = uptime;
-			//printf_P(PSTR("Hello World (%02x) (%d/%d)\r\n"), uart_getc(), cli_enabled, display_enabled);
-			display_degc((degc + 5) / 10);
+			display_degc(degc / 10);
+			print_statusline(degc, out);
 			config_dump();
 		}
 
-		degc = adc2degc(adc_get());
 	}
 
 	error = config->set_point - degc;
