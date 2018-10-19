@@ -16,22 +16,22 @@
 
 #define VERSION "0.1"
 
-static volatile uint8_t pwm_steps;
+static volatile uint8_t __pwm_steps;
 static void pwm_set(uint8_t steps)
 {
-	pwm_steps = steps;
+	__pwm_steps = steps;
 }
 
 static void pwm_init(void)
 {
-	pwm_steps = 0;
+	__pwm_steps = 0;
 	PORTB &= _BV(PB4);
 	DDRB |= _BV(PB4);
 }
 
 static void pwm_off(void)
 {
-	pwm_steps = 0;
+	__pwm_steps = 0;
 	PORTB &= ~_BV(PB4);
 }
 
@@ -61,9 +61,9 @@ ISR(TIM1_COMPA_vect)
 	static uint8_t cycle = 0;
 
 	/* only set the pwm output of the beginning of the cycle */
-	if (pwm_steps && cycle == 0)
+	if (__pwm_steps && cycle == 0)
 		PORTB |= _BV(PB4);
-	else if (cycle >= pwm_steps)
+	else if (cycle >= __pwm_steps)
 		PORTB &= ~_BV(PB4);
 
 	__millis += 10;

@@ -4,7 +4,7 @@
 
 #include "adc.h"
 
-static volatile uint16_t adc_val;
+static volatile uint16_t __adc_val;
 ISR(ADC_vect)
 {
 	uint16_t val;
@@ -18,7 +18,7 @@ ISR(ADC_vect)
 	if (count--) {
 		sum += val;
 	} else {
-		adc_val = sum >> 3;
+		__adc_val = sum >> 3;
 		sum = 0;
 		count = 64;
 	}
@@ -27,12 +27,10 @@ ISR(ADC_vect)
 uint16_t adc_get(void)
 {
 	uint16_t _adc_val;
-
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		_adc_val = adc_val;
+		_adc_val = __adc_val;
 	}
-
 	return _adc_val;
 }
 

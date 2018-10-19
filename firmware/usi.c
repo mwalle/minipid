@@ -17,12 +17,12 @@ enum {
 	USI_TWI,
 };
 
-static volatile uint8_t usi_state;
-static volatile uint8_t uart_tx_char;
-static volatile uint8_t uart_rx_buf[12];
-static volatile uint8_t uart_rx_idx;
-static char uart_rx_dbl_buf[sizeof(uart_rx_buf)];
-static volatile uint8_t usi_event;
+static volatile uint8_t __usi_state;
+static volatile uint8_t __uart_tx_char;
+static volatile uint8_t __uart_rx_buf[12];
+static volatile uint8_t __uart_rx_idx;
+static volatile uint8_t __usi_event;
+static char uart_rx_dbl_buf[sizeof(__uart_rx_buf)];
 
 static uint8_t swapb(uint8_t b)
 {
@@ -36,8 +36,8 @@ static void usi_aquire(uint8_t new_state)
 {
 	while (true) {
 		ATOMIC_BLOCK(ATOMIC_FORCEON) {
-			if (usi_state == USI_IDLE) {
-				usi_state = new_state;
+			if (__usi_state == USI_IDLE) {
+				__usi_state = new_state;
 				return;
 			}
 		}
@@ -46,7 +46,7 @@ static void usi_aquire(uint8_t new_state)
 
 static void usi_release(void)
 {
-	usi_state = USI_IDLE;
+	__usi_state = USI_IDLE;
 }
 
 static void usi_stop(void)
@@ -84,7 +84,7 @@ ISR(PCINT0_vect)
 {
 	/* If a transmission is in progress, there is nothing we can do. Just
 	 * ignore the interrupt. */
-	if (usi_state != USI_IDLE)
+	if (__usi_state != USI_IDLE)
 		return;
 
 	/* uart start bit detected */
@@ -103,26 +103,26 @@ ISR(PCINT0_vect)
 		/* mask any further pin change interrupts */
 		PCMSK &= ~_BV(PCINT0);
 
-		usi_state = USI_UART_RX;
+		__usi_state = USI_UART_RX;
 	}
 }
 
 ISR(USI_OVF_vect)
 {
-	switch (usi_state) {
+	switch (__usi_state) {
 	case USI_UART_TX1:
 		/* clear flags and cause overflow after 5 clocks */
 		USISR = _BV(USIOIF) | USICNT(5);
 		/* second half of the data: 5 data bits, stop bit, two idle bits */
-		USIDR = 0x07 | uart_tx_char << 3;
-		usi_state = USI_UART_TX2;
+		USIDR = 0x07 | __uart_tx_char << 3;
+		__usi_state = USI_UART_TX2;
 		break;
 	case USI_UART_RX:
 		/* last byte of uart_rx_buf is always zero to ensure the string is
 		 * always zero terminated */
-		uart_rx_idx = MIN(uart_rx_idx + 1, sizeof(uart_rx_buf) - 2);
-		uart_rx_buf[uart_rx_idx] = swapb(USIDR);
-		usi_event = 1;
+		__uart_rx_idx = MIN(__uart_rx_idx + 1, sizeof(__uart_rx_buf) - 2);
+		__uart_rx_buf[__uart_rx_idx] = swapb(USIDR);
+		__usi_event = 1;
 		/* reenable pin change interrupt again */
 		PCMSK |= _BV(PCINT0);
 		/* fall through */
@@ -144,7 +144,7 @@ void uart_putc(const char c)
 
 	usi_aquire(USI_UART_TX1);
 
-	uart_tx_char = swapb(c);
+	__uart_tx_char = swapb(c);
 
 	/* clear flags and cause overflow after 5 clocks */
 	USISR = _BV(USIOIF) | USICNT(5);
@@ -154,7 +154,7 @@ void uart_putc(const char c)
 	USICR = _BV(USIOIE) | _BV(USIWM0) | _BV(USICS0);
 
 	/* load first half of the byte to be transmitted */
-	USIDR = 0x80 | uart_tx_char >> 2; /* idle bit, start bit, 6 data bits */
+	USIDR = 0x80 | __uart_tx_char >> 2; /* idle bit, start bit, 6 data bits */
 
 	/* turn output on, should be high, because the msb in USIDR is 1 */
 	DDRB |= _BV(PB1);
@@ -179,8 +179,8 @@ void uart_puts_P(const char *s)
 const char *uart_get_buf(void)
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON) {
-		memcpy(uart_rx_dbl_buf, (void*)uart_rx_buf, sizeof(uart_rx_dbl_buf));
-		uart_rx_idx = 0;
+		memcpy(uart_rx_dbl_buf, (void*)__uart_rx_buf, sizeof(uart_rx_dbl_buf));
+		__uart_rx_idx = 0;
 	}
 	return uart_rx_dbl_buf;
 }
@@ -190,8 +190,8 @@ char uart_getc(void)
 	char c;
 
 	ATOMIC_BLOCK(ATOMIC_FORCEON) {
-		usi_event = 0;
-		c = uart_rx_buf[uart_rx_idx];
+		__usi_event = 0;
+		c = __uart_rx_buf[__uart_rx_idx];
 	}
 
 	return c;
@@ -199,7 +199,7 @@ char uart_getc(void)
 
 void uart_poll(void)
 {
-	while (!usi_event);
+	while (!__usi_event);
 }
 
 void twi_transfer(uint8_t *data, uint8_t len)
@@ -288,7 +288,7 @@ void uart_tx_twi_init(void)
 	/* enable overflow interrupt */
 	TIMSK |= _BV(TOIE0);
 
-	usi_state = USI_IDLE;
+	__usi_state = USI_IDLE;
 }
 
 /*
@@ -316,10 +316,10 @@ void uart_rx_tx_init(void)
 	/* enable overflow interrupt */
 	TIMSK |= _BV(TOIE0);
 
-	uart_rx_idx = 0;
-	memset((uint8_t*)uart_rx_buf, 0, sizeof(uart_rx_buf));
+	__uart_rx_idx = 0;
+	memset((uint8_t*)__uart_rx_buf, 0, sizeof(__uart_rx_buf));
 	memset(uart_rx_dbl_buf, 0, sizeof(uart_rx_dbl_buf));
 
-	usi_event = 0;
-	usi_state = USI_IDLE;
+	__usi_event = 0;
+	__usi_state = USI_IDLE;
 }
