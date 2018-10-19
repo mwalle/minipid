@@ -9,6 +9,7 @@
 
 #include "usi.h"
 #include "adc.h"
+#include "pid.h"
 #include "config.h"
 
 #define VERSION "0.1"
