@@ -3,11 +3,13 @@
 #include <stdint.h>
 #include <string.h>
 #include <avr/pgmspace.h>
+#include <avr/eeprom.h>
 
 #include "pid.h"
 #include "usi.h"
 #include "config.h"
 
+static struct config eep_config EEMEM;
 struct config _config, *config = &_config;
 
 static void dump_param_decpoint(char param, int16_t val_fp)
@@ -69,9 +71,18 @@ static void config_init_default(void)
 	config->auto_off_time = 0;
 }
 
+void config_save(void)
+{
+	eeprom_update_block(config, &eep_config, sizeof(*config));
+}
+
 void config_init(void)
 {
-	config_init_default();
+	eeprom_read_block(config, &eep_config, sizeof(*config));
+	if (config->version != 1) {
+		config_init_default();
+		config_save();
+	}
 }
 
 void config_dump(void)
@@ -153,5 +164,4 @@ void config_scan_input(const char *str)
 	default:
 		break;
 	}
-
 }

@@ -17,6 +17,7 @@ struct config {
 extern struct config *config;
 
 void config_init(void);
+void config_save(void);
 void config_dump(void);
 void config_scan_input(const char *str);
 
