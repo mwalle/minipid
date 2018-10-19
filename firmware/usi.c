@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <string.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
@@ -6,6 +7,7 @@
 #include <util/atomic.h>
 
 #define BAUD 9600
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 enum {
 	USI_IDLE,
@@ -17,7 +19,10 @@ enum {
 
 static volatile uint8_t usi_state;
 static volatile uint8_t uart_tx_char;
-static volatile uint8_t uart_rx_char;
+static volatile uint8_t uart_rx_buf[12];
+static volatile uint8_t uart_rx_idx;
+static char uart_rx_dbl_buf[sizeof(uart_rx_buf)];
+static volatile uint8_t usi_event;
 
 static uint8_t swapb(uint8_t b)
 {
@@ -113,7 +118,11 @@ ISR(USI_OVF_vect)
 		usi_state = USI_UART_TX2;
 		break;
 	case USI_UART_RX:
-		uart_rx_char = swapb(USIDR);
+		/* last byte of uart_rx_buf is always zero to ensure the string is
+		 * always zero terminated */
+		uart_rx_idx = MIN(uart_rx_idx + 1, sizeof(uart_rx_buf) - 2);
+		uart_rx_buf[uart_rx_idx] = swapb(USIDR);
+		usi_event = 1;
 		/* reenable pin change interrupt again */
 		PCMSK |= _BV(PCINT0);
 		/* fall through */
@@ -167,9 +176,30 @@ void uart_puts_P(const char *s)
 		uart_putc(c);
 }
 
+const char *uart_get_buf(void)
+{
+	ATOMIC_BLOCK(ATOMIC_FORCEON) {
+		memcpy(uart_rx_dbl_buf, (void*)uart_rx_buf, sizeof(uart_rx_dbl_buf));
+		uart_rx_idx = 0;
+	}
+	return uart_rx_dbl_buf;
+}
+
 char uart_getc(void)
 {
-	return uart_rx_char;
+	char c;
+
+	ATOMIC_BLOCK(ATOMIC_FORCEON) {
+		usi_event = 0;
+		c = uart_rx_buf[uart_rx_idx];
+	}
+
+	return c;
+}
+
+void uart_poll(void)
+{
+	while (!usi_event);
 }
 
 void twi_transfer(uint8_t *data, uint8_t len)
@@ -257,6 +287,7 @@ void uart_tx_twi_init(void)
 
 	/* enable overflow interrupt */
 	TIMSK |= _BV(TOIE0);
+
 	usi_state = USI_IDLE;
 }
 
@@ -284,5 +315,11 @@ void uart_rx_tx_init(void)
 
 	/* enable overflow interrupt */
 	TIMSK |= _BV(TOIE0);
+
+	uart_rx_idx = 0;
+	memset((uint8_t*)uart_rx_buf, 0, sizeof(uart_rx_buf));
+	memset(uart_rx_dbl_buf, 0, sizeof(uart_rx_dbl_buf));
+
+	usi_event = 0;
 	usi_state = USI_IDLE;
 }
