@@ -5,6 +5,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
+#include <util/atomic.h>
 #include <util/delay.h>
 
 #include "usi.h"
@@ -33,7 +34,27 @@ static void pwm_off(void)
 	PORTB &= ~_BV(PB4);
 }
 
-static uint16_t uptime;
+static volatile uint16_t __uptime;
+static volatile uint32_t __millis;
+
+uint16_t uptime(void)
+{
+	uint16_t _uptime;
+	ATOMIC_BLOCK(ATOMIC_FORCEON) {
+		_uptime = __uptime;
+	}
+	return _uptime;
+}
+
+uint32_t millis(void)
+{
+	uint32_t _millis;
+	ATOMIC_BLOCK(ATOMIC_FORCEON) {
+		_millis = __millis;
+	}
+	return _millis;
+}
+
 ISR(TIM1_COMPA_vect)
 {
 	static uint8_t cycle = 0;
@@ -44,8 +65,10 @@ ISR(TIM1_COMPA_vect)
 	else if (cycle >= pwm_steps)
 		PORTB &= ~_BV(PB4);
 
+	__millis += 10;
+
 	if (cycle == 100 || cycle == 200)
-		uptime++;
+		__uptime++;
 
 	if (++cycle >= 200)
 		cycle = 0;
@@ -210,7 +233,7 @@ static void display_degc(uint8_t val)
 static void print_statusline(int16_t degc, int16_t pwm)
 {
 	char buf[8];
-	uart_puts(itoa(uptime, buf, 10));
+	uart_puts(itoa(uptime(), buf, 10));
 	uart_puts_P(PSTR(" "));
 	uart_puts(itoa(degc / 10, buf, 10));
 	uart_puts_P(PSTR("."));
@@ -225,7 +248,10 @@ int main(void)
 	bool cli_enabled = false;
 	bool display_enabled = false;
 
+	uint16_t _uptime;
+	uint32_t _millis;
 	uint16_t last_uptime = UINT16_MAX;
+	uint16_t next_sample_time = 0;
 	int16_t degc;
 	int16_t error;
 	int16_t out;
@@ -279,7 +305,10 @@ int main(void)
 
 	while (true) {
 		degc = adc2degc(adc_get());
-		if (uptime != last_uptime) {
+		_uptime = uptime();
+		if (_uptime != last_uptime) {
+			last_uptime = _uptime;
+
 			if (cli_enabled && uart_getc() == '\n')
 				configuration_mode();
 			if (display_enabled) {
@@ -288,14 +317,19 @@ int main(void)
 			print_statusline(degc, out);
 		}
 
-		error = config->set_point - degc;
-		out = pid_update(error, degc);
-		if (out > 200) {
-			out = 200;
-		} else if (out < 0) {
-			out = 0;
+		_millis = millis();
+		if (_millis > next_sample_time) {
+			next_sample_time = _millis + config->sample_time_ms;
+
+			error = config->set_point - degc;
+			out = pid_update(error, degc);
+			if (out > 200) {
+				out = 200;
+			} else if (out < 0) {
+				out = 0;
+			}
+			pwm_set(out);
 		}
-		pwm_set(out);
 	}
 
 	return 0;
