@@ -11,6 +11,7 @@ struct config {
 	int16_t set_point;
 	int16_t band;
 	uint16_t sample_time_ms;
+	int16_t emergency_off;
 	uint16_t auto_off_time;
 } __attribute__((packed));
 

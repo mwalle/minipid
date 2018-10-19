@@ -68,6 +68,7 @@ static void config_init_default(void)
 	config->set_point = 1000;
 	config->band = 100;
 	config->sample_time_ms = 100;
+	config->emergency_off = 1600;
 	config->auto_off_time = 0;
 }
 
