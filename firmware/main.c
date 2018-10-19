@@ -10,6 +10,7 @@
 
 #include "usi.h"
 #include "adc.h"
+#include "pt1000.h"
 #include "pid.h"
 #include "config.h"
 

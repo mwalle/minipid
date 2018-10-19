@@ -1,7 +1,7 @@
 TARGET = minipid
 MCU = attiny85
 PMCU = t85
-SOURCES = main.c usi.c pid.c config.c adc.c
+SOURCES = main.c usi.c pid.c config.c adc.c pt1000.c
 
 PROGRAMMER = buspirate
 PORT = /dev/ttyUSB0
