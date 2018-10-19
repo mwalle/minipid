@@ -26,6 +26,12 @@ static void pwm_init(void)
 	DDRB |= _BV(PB4);
 }
 
+static void pwm_off(void)
+{
+	pwm_steps = 0;
+	PORTB &= ~_BV(PB4);
+}
+
 static uint16_t uptime;
 ISR(TIM1_COMPA_vect)
 {
@@ -102,6 +108,42 @@ static void blink_errorcode(uint8_t code)
 		_delay_ms(10000);
 	}
 }
+
+static void configuration_mode(void)
+{
+	const char *buf;
+	char c;
+
+	/* turn output off */
+	pwm_off();
+
+	uart_get_buf();
+	uart_puts_P(PSTR("Configuration mode, output disabled."));
+
+	while (true) {
+		uart_puts_P(PSTR("config> "));
+		while (true) {
+			uart_poll();
+			c = uart_getc();
+
+			/* echo back */
+			uart_putc(c);
+
+			if (c == '\n')
+				break;
+		}
+
+		buf = uart_get_buf();
+		if (!strcmp_P(buf, PSTR("exit")))
+			return;
+		else if (!strcmp_P(buf, PSTR("save")))
+			config_save();
+		else
+			config_scan_input(buf);
+		config_dump();
+	}
+}
+
 
 static void display_init(void)
 {
@@ -230,14 +272,19 @@ int main(void)
 	sei();
 
 	uart_puts_P(PSTR("minipid v" VERSION "\n"));
+	if (cli_enabled) {
+		uart_puts_P(PSTR("UART detected. Press return to enter configuration mode."));
+	}
 
 	while (true) {
 		degc = adc2degc(adc_get());
 		if (uptime != last_uptime) {
-			last_uptime = uptime;
-			display_degc(degc / 10);
+			if (cli_enabled && uart_getc() == '\n')
+				configuration_mode();
+			if (display_enabled) {
+				display_degc(degc / 10);
+			}
 			print_statusline(degc, out);
-			config_dump();
 		}
 
 		error = config->set_point - degc;
