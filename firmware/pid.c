@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "pid.h"
+#include "config.h"
 
 #undef UT_ENABLED
 
@@ -27,23 +28,22 @@ struct pid {
 
 struct pid _pid, *pid = &_pid;
 
-void pid_init(int16_t p_gain, int16_t i_gain, int16_t d_gain,
-		int32_t i_min, int32_t i_max, int16_t band)
+void pid_init(void)
 {
-	pid->p_gain = p_gain;
-	pid->band = band;
+	pid->p_gain = config->kp;
+	pid->band = config->band;
 	//pid->max_error = INT16_MAX / (pid->p_gain + 1);
 
-	pid->i_gain = i_gain;
-	pid->i_min = i_min;
-	pid->i_max = i_max;
+	pid->i_gain = config->ki;
+	pid->i_min = config->i_min;
+	pid->i_max = config->i_max;
 
 	//pid->kt = 5;
 	//pid->out_min = 0;
 	//pid->out_max = 200;
 
 #ifdef PID_D
-	pid->d_gain = d_gain;
+	pid->d_gain = config->d_gain;
 #endif
 
 	pid_reset();
@@ -153,7 +153,7 @@ int main(void)
 	int16_t drive;
 
 #define k (1 << PID_SCALING_SHIFT)
-	pid_init(0.75 * k, 0.1 * k, 0.00 * k, 0, 200, 100);
+	pid_init();
 
 	while(i++ < 1000) {
 		position = read_val();

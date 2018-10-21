@@ -315,6 +315,7 @@ int main(void)
 		display_init();
 	pwm_init();
 	timer1_init();
+	pid_init();
 
 	sei();
 
@@ -338,7 +339,7 @@ int main(void)
 
 		if (cli_enabled && uart_getc() == '\r') {
 			configuration_mode();
-			pid_reset();
+			pid_init();
 		}
 
 		_millis = millis();
