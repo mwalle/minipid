@@ -143,7 +143,7 @@ static void configuration_mode(void)
 	pwm_off();
 
 	uart_get_buf();
-	uart_puts_P(PSTR("Configuration mode, output disabled."));
+	uart_puts_P(PSTR("Configuration mode, output disabled.\n"));
 
 	while (true) {
 		uart_puts_P(PSTR("config> "));
@@ -151,21 +151,39 @@ static void configuration_mode(void)
 			uart_poll();
 			c = uart_getc();
 
+			if (c == '\r') {
+				uart_putc('\n');
+				break;
+			}
+
 			/* echo back */
 			uart_putc(c);
-
-			if (c == '\n')
-				break;
 		}
 
 		buf = uart_get_buf();
-		if (!strcmp_P(buf, PSTR("exit")))
-			return;
-		else if (!strcmp_P(buf, PSTR("save")))
+		if (buf[0] == '.') {
+			config_scan_input(buf + 1);
+			config_dump();
+		} else if (buf[0] == '\r') {
+			continue;
+		} else if (!strncmp_P(buf, PSTR("dump"), 4)) {
+			config_dump();
+		} else if (!strncmp_P(buf, PSTR("save"), 4)) {
+			uart_puts_P(PSTR("Saving config to EEPROM.\n"));
 			config_save();
-		else
-			config_scan_input(buf);
-		config_dump();
+		} else if (!strncmp_P(buf, PSTR("exit"), 4)) {
+			uart_puts_P(PSTR("Exitting config mode.\n"));
+			return;
+		} else if (!strncmp_P(buf, PSTR("help"), 4)) {
+			uart_puts_P(PSTR(
+						"Available commands:\n"
+						".<P> <V> - set parameter <P> to value <V>\n"
+						"dump - show config\n"
+						"save - show config\n"
+						"exit - show config\n"));
+		} else {
+			uart_puts_P(PSTR("Unknown command, try 'help'.\n"));
+		}
 	}
 }
 
@@ -293,15 +311,17 @@ int main(void)
 		uart_tx_twi_init();
 
 	adc_init();
-	display_init();
+	if (display_enabled)
+		display_init();
 	pwm_init();
 	timer1_init();
 
 	sei();
 
 	uart_puts_P(PSTR("minipid v" VERSION "\n"));
+
 	if (cli_enabled) {
-		uart_puts_P(PSTR("UART detected. Press return to enter configuration mode."));
+		uart_puts_P(PSTR("UART detected. Press return to enter configuration mode.\n"));
 	}
 
 	while (true) {
@@ -310,12 +330,15 @@ int main(void)
 		if (_uptime != last_uptime) {
 			last_uptime = _uptime;
 
-			if (cli_enabled && uart_getc() == '\n')
-				configuration_mode();
 			if (display_enabled) {
 				display_degc(degc / 10);
 			}
 			print_statusline(degc, out);
+		}
+
+		if (cli_enabled && uart_getc() == '\r') {
+			configuration_mode();
+			pid_reset();
 		}
 
 		_millis = millis();
