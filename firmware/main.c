@@ -68,7 +68,7 @@ ISR(TIM1_COMPA_vect)
 
 	__millis += 10;
 
-	if (cycle == 100 || cycle == 200)
+	if (cycle == 99 || cycle == 199)
 		__uptime++;
 
 	if (++cycle >= 200)
@@ -270,7 +270,7 @@ int main(void)
 	uint16_t _uptime;
 	uint32_t _millis;
 	uint16_t last_uptime = UINT16_MAX;
-	uint16_t next_sample_time = 0;
+	uint32_t next_sample_time = 0;
 	int16_t degc;
 	int16_t error;
 	int16_t out;
