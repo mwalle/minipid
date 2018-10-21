@@ -20,9 +20,8 @@ enum {
 static volatile uint8_t __usi_state;
 static volatile uint8_t __uart_tx_char;
 static volatile uint8_t __uart_rx_buf[12];
-static volatile uint8_t __uart_rx_idx;
+static volatile int8_t __uart_rx_idx;
 static volatile uint8_t __usi_event;
-static char uart_rx_dbl_buf[sizeof(__uart_rx_buf)];
 
 static uint8_t swapb(uint8_t b)
 {
@@ -178,11 +177,12 @@ void uart_puts_P(const char *s)
 
 const char *uart_get_buf(void)
 {
+	static char buf[sizeof(__uart_rx_buf)];
 	ATOMIC_BLOCK(ATOMIC_FORCEON) {
-		memcpy(uart_rx_dbl_buf, (void*)__uart_rx_buf, sizeof(uart_rx_dbl_buf));
-		__uart_rx_idx = 0;
+		memcpy(buf, (void*)__uart_rx_buf, sizeof(buf));
+		__uart_rx_idx = -1;
 	}
-	return uart_rx_dbl_buf;
+	return buf;
 }
 
 char uart_getc(void)
@@ -191,7 +191,10 @@ char uart_getc(void)
 
 	ATOMIC_BLOCK(ATOMIC_FORCEON) {
 		__usi_event = 0;
-		c = __uart_rx_buf[__uart_rx_idx];
+		if (__uart_rx_idx == -1)
+			c = '\0';
+		else
+			c = __uart_rx_buf[__uart_rx_idx];
 	}
 
 	return c;
@@ -316,9 +319,8 @@ void uart_rx_tx_init(void)
 	/* enable overflow interrupt */
 	TIMSK |= _BV(TOIE0);
 
-	__uart_rx_idx = 0;
+	__uart_rx_idx = -1;
 	memset((uint8_t*)__uart_rx_buf, 0, sizeof(__uart_rx_buf));
-	memset(uart_rx_dbl_buf, 0, sizeof(uart_rx_dbl_buf));
 
 	__usi_event = 0;
 	__usi_state = USI_IDLE;
