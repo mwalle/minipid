@@ -60,11 +60,11 @@ static void dump_param(char param, int16_t val)
 static void config_init_default(void)
 {
 	config->version = 1;
-	config->kp = 0.75 * 1024;
-	config->ki = 0.00 * 1024;
-	config->kd = 0.00 * 1024;
+	config->kp = 0.75 * (1 << PID_SCALING_SHIFT);
+	config->ki = 0.00 * (1 << PID_SCALING_SHIFT);
+	config->kd = 0.00 * (1 << PID_SCALING_SHIFT);
 	config->i_min = 0;
-	config->i_max = 10.0 * 1024;
+	config->i_max = 10.0 * (1 << PID_SCALING_SHIFT);
 	config->set_point = 1000;
 	config->band = 100;
 	config->sample_time_ms = 100;
