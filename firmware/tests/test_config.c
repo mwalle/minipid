@@ -12,15 +12,15 @@ void test_config_dump(void)
 	config->kp = 10 * k;
 	config->ki = 0.75 * k;
 	config->kd = 0.15 * k;
-	config->i_min = 10;
-	config->i_max = 100;
+	config->i_min = 10 * k;
+	config->i_max = 30 * k;
 	config->set_point = 1050;
 	config->band = 200;
 	config->sample_time_ms = 100;
 	config->auto_off_time = 2 * 60 * 60;
 
 	config_dump();
-	g_assert_cmpstr(test_buf_get(), ==, "P10.00I0.75D0.14m10M100S1050B200T100O7200\n");
+	g_assert_cmpstr(test_buf_get(), ==, "P10.00I0.75D0.14m10.00M30.00S1050B200T100O7200\n");
 }
 
 void test_config_scan_input_fp(void)
@@ -34,14 +34,14 @@ void test_config_scan_input_fp(void)
 
 void test_config_scan_input_int(void)
 {
-	config_scan_input("M10");
-	g_assert_cmpint(config->i_max, ==, 10);
+	config_scan_input("B10");
+	g_assert_cmpint(config->band, ==, 10);
 
-	config_scan_input("M15\n");
-	g_assert_cmpint(config->i_max, ==, 15);
+	config_scan_input("B15\n");
+	g_assert_cmpint(config->band, ==, 15);
 
-	config_scan_input("M15.12");
-	g_assert_cmpint(config->i_max, ==, 15);
+	config_scan_input("B15.12");
+	g_assert_cmpint(config->band, ==, 15);
 }
 
 int main(int argc, char **argv)

@@ -64,7 +64,7 @@ static void config_init_default(void)
 	config->ki = 0.00 * 1024;
 	config->kd = 0.00 * 1024;
 	config->i_min = 0;
-	config->i_max = 100;
+	config->i_max = 10.0 * 1024;
 	config->set_point = 1000;
 	config->band = 100;
 	config->sample_time_ms = 100;
@@ -91,8 +91,8 @@ void config_dump(void)
 	dump_param_decpoint('P', config->kp);
 	dump_param_decpoint('I', config->ki);
 	dump_param_decpoint('D', config->kd);
-	dump_param('m', config->i_min);
-	dump_param('M', config->i_max);
+	dump_param_decpoint('m', config->i_min);
+	dump_param_decpoint('M', config->i_max);
 	dump_param('S', config->set_point);
 	dump_param('B', config->band);
 	dump_param('T', config->sample_time_ms);
@@ -140,11 +140,11 @@ void config_scan_input(const char *str)
 		break;
 	case 'm':
 		/* Imin */
-		config->i_min = val;
+		config->i_min = val_fp;
 		break;
 	case 'M':
 		/* Imax */
-		config->i_max = val;
+		config->i_max = val_fp;
 		break;
 	case 'S':
 		/* set point */

@@ -3,8 +3,6 @@
 #include "pid.h"
 #include "config.h"
 
-#undef UT_ENABLED
-
 struct pid {
 	int16_t p_gain;
 	int16_t i_gain;
@@ -78,7 +76,7 @@ int16_t pid_update(int16_t error, int16_t position)
 	p = (int32_t)pid->p_gain * error;
 
 	/* account error within limits */
-	i = (int32_t)pid->i_sum + error;
+	i = (int32_t)pid->i_sum + (pid->i_gain * error * config->sample_time_ms / 1000);
 #if 0
 	if (pid->out_last > pid->out_max) {
 		//printf("remove %d..", pid->i_sum);
@@ -91,13 +89,10 @@ int16_t pid_update(int16_t error, int16_t position)
 	}
 #else
 	if (i > pid->i_max)
-		pid->i_sum = pid->i_max;
+		i = pid->i_max;
 	else if (i < pid->i_min)
-		pid->i_sum = pid->i_min;
-	else
-		pid->i_sum = i;
+		i = pid->i_min;
 #endif
-	i = pid->i_gain * pid->i_sum;
 
 #if PID_D
 	if (pid->d_last != INT16_MIN)
@@ -110,9 +105,10 @@ int16_t pid_update(int16_t error, int16_t position)
 #endif
 
 	ret = (p + i + d) >> PID_SCALING_SHIFT;
+	pid->i_sum = i;
 
 #ifdef UT_ENABLED
-	printf("PID error=%d p=%f i=%f d=%f ret=%d\r\n", error, (float)p/1024, (float)i/1024, (float)d/1024, ret);
+	printf("PID error=%d p=%f i=%f i_sum=%f d=%f ret=%d\r\n", error, (float)p/1024, (float)i/1024, (float)pid->i_sum/1024, (float)d/1024, ret);
 #endif
 	if (ret > INT16_MAX)
 		ret = INT16_MAX;
@@ -153,6 +149,14 @@ int main(void)
 	int16_t drive;
 
 #define k (1 << PID_SCALING_SHIFT)
+	config->kp = 0.75 * k;
+	config->band = 100;
+
+	config->ki = 0.1 * k;
+	config->i_min = 0 * k;
+	config->i_max = 10 * k;
+	config->sample_time_ms = 100;
+
 	pid_init();
 
 	while(i++ < 1000) {
