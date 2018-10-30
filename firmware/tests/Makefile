@@ -10,4 +10,4 @@ test_pt1000: test_pt1000.c mockup.c
 	gcc -Iinclude/ $(shell pkg-config --libs --cflags glib-2.0) -o $@ $^
 
 clean:
-	rm -f test_config
+	rm -f test_config test_pt1000
