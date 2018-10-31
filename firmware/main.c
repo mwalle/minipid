@@ -1,3 +1,10 @@
+/*
+ * minipid - attiny-based heating controller
+ * Copyright (c) 2018, Michael Walle <michael@walle.cc>
+ *
+ * SPDX-License-Identifier: GPL-2.0
+ */
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>

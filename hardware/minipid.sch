@@ -8,9 +8,9 @@ Sheet 1 1
 Title "minipid"
 Date "2018-09-24"
 Rev "1"
-Comp "michael@walle.cc"
-Comment1 ""
-Comment2 ""
+Comp ""
+Comment1 "Copyright (c) 2018, Michael Walle <michael@walle.cc>"
+Comment2 "Licensed under CERN OHL v.1.2"
 Comment3 ""
 Comment4 ""
 $EndDescr
