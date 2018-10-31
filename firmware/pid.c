@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <avr/pgmspace.h>
+
 #include "pid.h"
+#include "usi.h"
 #include "config.h"
 
 struct pid {
@@ -56,6 +60,25 @@ void pid_reset(void)
 #endif
 }
 
+uint32_t millis(void);
+static void print_pid_statusline(int16_t error, int32_t p, int32_t i, int32_t d, int32_t ret)
+{
+	char buf[12];
+	uart_puts_P(PSTR("error="));
+	uart_puts(itoa(error, buf, 10));
+	uart_puts_P(PSTR(" p="));
+	uart_puts(ltoa(p, buf, 10));
+	uart_puts_P(PSTR(" i="));
+	uart_puts(ltoa(i, buf, 10));
+	uart_puts_P(PSTR(" d="));
+	uart_puts(ltoa(d, buf, 10));
+	uart_puts_P(PSTR(" ret="));
+	uart_puts(ltoa(ret, buf, 10));
+	uart_puts_P(PSTR(" i_sum="));
+	uart_puts(itoa(pid->i_sum, buf, 10));
+	uart_puts_P(PSTR("\n"));
+}
+
 int16_t pid_update(int16_t error, int16_t position)
 {
 	int32_t ret, p, i, d;
@@ -107,9 +130,15 @@ int16_t pid_update(int16_t error, int16_t position)
 	ret = (p + i + d) >> PID_SCALING_SHIFT;
 	pid->i_sum = i;
 
-#ifdef UT_ENABLED
-	printf("PID error=%d p=%f i=%f i_sum=%f d=%f ret=%d\r\n", error, (float)p/1024, (float)i/1024, (float)pid->i_sum/1024, (float)d/1024, ret);
-#endif
+	if (config->flags & FLAGS_DEBUG_PID)
+	{
+		static uint32_t next_tout = 0;
+		if (millis() > next_tout) {
+			next_tout = millis() + 1000;
+			print_pid_statusline(error, p, i, d, ret);
+		}
+	}
+
 	if (ret > INT16_MAX)
 		ret = INT16_MAX;
 	else if (ret < INT16_MIN)

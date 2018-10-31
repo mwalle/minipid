@@ -1,6 +1,8 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
+#define FLAGS_DEBUG_PID _BV(0)
+
 struct config {
 	uint8_t version;
 	int16_t kp;
@@ -13,6 +15,7 @@ struct config {
 	uint16_t sample_time_ms;
 	int16_t emergency_off;
 	uint16_t auto_off_time;
+	uint8_t flags;
 } __attribute__((packed));
 
 extern struct config *config;

@@ -97,6 +97,7 @@ void config_dump(void)
 	dump_param('B', config->band);
 	dump_param('T', config->sample_time_ms);
 	dump_param('O', config->auto_off_time);
+	dump_param('F', config->flags);
 	uart_putc('\n');
 }
 
@@ -161,6 +162,10 @@ void config_scan_input(const char *str)
 	case 'O':
 		/* auto off time */
 		config->auto_off_time = val;
+		break;
+	case 'F':
+		/* flags */
+		config->flags = val;
 		break;
 	default:
 		break;
