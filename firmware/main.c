@@ -110,11 +110,14 @@ static void timer1_stop(void)
 
 enum {
 	ERROR_INVALID_SDA_SCL_STATE = 1,
+	ERROR_SENSOR_UNCONNECTED = 2,
+	ERROR_SENSOR_SHORTED = 3,
 };
 
 static void blink_errorcode(uint8_t code) __attribute__((noreturn));
 static void blink_errorcode(uint8_t code)
 {
+	char buf[8];
 	int i;
 
 	/* turn output off */
@@ -122,6 +125,11 @@ static void blink_errorcode(uint8_t code)
 	PORTB &= ~_BV(PB4);
 
 	while (true) {
+		/* output error on UART */
+		uart_puts_P(PSTR("ERR"));
+		uart_puts(itoa(code, buf, 10));
+		uart_puts_P(PSTR("\n"));
+
 		/* two short blinks */
 		for (i = 0; i < 2; i++) {
 			PORTB |= _BV(PB4);
@@ -285,6 +293,7 @@ int main(void)
 	uint32_t _millis;
 	uint16_t last_uptime = UINT16_MAX;
 	uint32_t next_sample_time = 0;
+	uint16_t adc_val;
 	int16_t degc;
 	int16_t error;
 	int16_t out;
@@ -343,7 +352,12 @@ int main(void)
 	}
 
 	while (true) {
-		degc = adc2degc(adc_get());
+		adc_val = adc_get();
+		if (adc_val == ADC_OPEN)
+			blink_errorcode(ERROR_SENSOR_UNCONNECTED);
+		if (adc_val == ADC_SHORT)
+			blink_errorcode(ERROR_SENSOR_SHORTED);
+		degc = adc2degc(adc_val);
 		_uptime = uptime();
 		if (_uptime != last_uptime) {
 			last_uptime = _uptime;
