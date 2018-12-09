@@ -115,44 +115,6 @@ enum {
 	ERROR_EMERGENCY_OFF = 4,
 };
 
-static void blink_errorcode(uint8_t code) __attribute__((noreturn));
-static void blink_errorcode(uint8_t code)
-{
-	char buf[8];
-	int i;
-
-	/* turn output off */
-	timer1_stop();
-	PORTB &= ~_BV(PB4);
-
-	while (true) {
-		/* output error on UART */
-		uart_puts_P(PSTR("ERR"));
-		uart_puts(itoa(code, buf, 10));
-		uart_puts_P(PSTR("\n"));
-
-		/* two short blinks */
-		for (i = 0; i < 2; i++) {
-			PORTB |= _BV(PB4);
-			_delay_ms(50);
-			PORTB &= ~_BV(PB4);
-			_delay_ms(300);
-		}
-
-		_delay_ms(500);
-		/* error code */
-		for (i = 0; i < code; i++) {
-			PORTB |= _BV(PB4);
-			_delay_ms(100);
-			PORTB &= ~_BV(PB4);
-			_delay_ms(500);
-		}
-
-		/* 10s pause */
-		_delay_ms(10000);
-	}
-}
-
 static void configuration_mode(void)
 {
 	const char *buf;
@@ -206,6 +168,46 @@ static void configuration_mode(void)
 	}
 }
 
+static void blink_errorcode(uint8_t code) __attribute__((noreturn));
+static void blink_errorcode(uint8_t code)
+{
+	char buf[8];
+	int i;
+
+	/* turn output off */
+	timer1_stop();
+	PORTB &= ~_BV(PB4);
+
+	while (true) {
+		if (uart_getc() == '\r')
+			configuration_mode();
+
+		/* output error on UART */
+		uart_puts_P(PSTR("ERR"));
+		uart_puts(itoa(code, buf, 10));
+		uart_puts_P(PSTR("\n"));
+
+		/* two short blinks */
+		for (i = 0; i < 2; i++) {
+			PORTB |= _BV(PB4);
+			_delay_ms(50);
+			PORTB &= ~_BV(PB4);
+			_delay_ms(300);
+		}
+
+		_delay_ms(500);
+		/* error code */
+		for (i = 0; i < code; i++) {
+			PORTB |= _BV(PB4);
+			_delay_ms(100);
+			PORTB &= ~_BV(PB4);
+			_delay_ms(500);
+		}
+
+		/* 10s pause */
+		_delay_ms(10000);
+	}
+}
 
 static void display_init(void)
 {
@@ -374,7 +376,7 @@ int main(void)
 			print_statusline(degc, out, auto_off);
 		}
 
-		if (cli_enabled && uart_getc() == '\r') {
+		if (uart_getc() == '\r') {
 			configuration_mode();
 			auto_off = false;
 			emergency_off_adc_val = degc2adc(config->emergency_off);
