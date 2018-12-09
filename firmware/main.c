@@ -256,7 +256,7 @@ static void display_degc(uint8_t val)
 	twi_transfer(buf, 5);
 }
 
-static void print_statusline(int16_t degc, int16_t pwm)
+static void print_statusline(int16_t degc, int16_t pwm, bool auto_off)
 {
 	char buf[8];
 	uart_puts(itoa(uptime(), buf, 10));
@@ -266,6 +266,9 @@ static void print_statusline(int16_t degc, int16_t pwm)
 	uart_puts(itoa(degc % 10, buf, 10));
 	uart_puts_P(PSTR(" "));
 	uart_puts(itoa(pwm, buf, 10));
+	uart_puts_P(PSTR(" "));
+	if (auto_off)
+		uart_puts_P(PSTR("auto-off "));
 	uart_puts_P(PSTR("\n"));
 }
 
@@ -273,6 +276,7 @@ int main(void)
 {
 	bool cli_enabled = false;
 	bool display_enabled = false;
+	bool auto_off = false;
 
 	uint16_t _uptime;
 	uint32_t _millis;
@@ -341,11 +345,12 @@ int main(void)
 			if (display_enabled) {
 				display_degc(degc / 10);
 			}
-			print_statusline(degc, out);
+			print_statusline(degc, out, auto_off);
 		}
 
 		if (cli_enabled && uart_getc() == '\r') {
 			configuration_mode();
+			auto_off = false;
 			pid_init();
 		}
 
@@ -360,8 +365,13 @@ int main(void)
 			} else if (out < 0) {
 				out = 0;
 			}
+			if (auto_off)
+				out = 0;
 			pwm_set(out);
 		}
+
+		if (config->auto_off_time && _uptime >= config->auto_off_time)
+			auto_off = true;
 	}
 
 	return 0;
