@@ -8,9 +8,9 @@ PORT = /dev/ttyUSB0
 BAUD = 115200
 F_CPU = 8000000
 
-OBJECTS=$(SOURCES:.c=.o)
-CFLAGS=-g -Os -Wall -DF_CPU=$(F_CPU)
-LDFLAGS=
+OBJECTS = $(SOURCES:.c=.o)
+CFLAGS = -g -Os -Wall -DF_CPU=$(F_CPU) $(EXTRA_CFLAGS)
+LDFLAGS =
 
 all: hex eeprom
 

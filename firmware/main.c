@@ -22,6 +22,9 @@
 #include "config.h"
 
 #define VERSION "0.1"
+#ifndef FORCE_CLI_ENABLED
+#define FORCE_CLI_ENABLED 0
+#endif
 
 static volatile uint8_t __pwm_steps;
 static void pwm_set(uint8_t steps)
@@ -315,6 +318,9 @@ int main(void)
 		display_enabled = true;
 		break;
 	}
+
+	if (FORCE_CLI_ENABLED)
+		cli_enabled = true;
 
 	if (cli_enabled)
 		uart_rx_tx_init();
