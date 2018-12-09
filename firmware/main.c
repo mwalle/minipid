@@ -123,10 +123,11 @@ static void configuration_mode(void)
 	/* turn output off */
 	pwm_off();
 
-	uart_get_buf();
 	uart_puts_P(PSTR("Configuration mode, output disabled.\n"));
 
 	while (true) {
+again:
+		uart_get_buf();
 		uart_puts_P(PSTR("config> "));
 		while (true) {
 			uart_poll();
@@ -135,6 +136,11 @@ static void configuration_mode(void)
 			if (c == '\r') {
 				uart_putc('\n');
 				break;
+			}
+
+			if (c == '\b' || c == 127) {
+				uart_puts("Backspace not supported. Try again.\n");
+				goto again;
 			}
 
 			/* echo back */
