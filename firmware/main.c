@@ -112,6 +112,7 @@ enum {
 	ERROR_INVALID_SDA_SCL_STATE = 1,
 	ERROR_SENSOR_UNCONNECTED = 2,
 	ERROR_SENSOR_SHORTED = 3,
+	ERROR_EMERGENCY_OFF = 4,
 };
 
 static void blink_errorcode(uint8_t code) __attribute__((noreturn));
@@ -297,8 +298,10 @@ int main(void)
 	int16_t degc;
 	int16_t error;
 	int16_t out;
+	uint16_t emergency_off_adc_val;
 
 	config_init();
+	emergency_off_adc_val = degc2adc(config->emergency_off);
 
 	/*
 	 * We have three cases for PB2 (SCL) and PB0 (SDA/UART_DI).
@@ -357,7 +360,10 @@ int main(void)
 			blink_errorcode(ERROR_SENSOR_UNCONNECTED);
 		if (adc_val == ADC_SHORT)
 			blink_errorcode(ERROR_SENSOR_SHORTED);
+		if (adc_val >= emergency_off_adc_val)
+			blink_errorcode(ERROR_EMERGENCY_OFF);
 		degc = adc2degc(adc_val);
+
 		_uptime = uptime();
 		if (_uptime != last_uptime) {
 			last_uptime = _uptime;
@@ -371,6 +377,7 @@ int main(void)
 		if (cli_enabled && uart_getc() == '\r') {
 			configuration_mode();
 			auto_off = false;
+			emergency_off_adc_val = degc2adc(config->emergency_off);
 			pid_init();
 		}
 

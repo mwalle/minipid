@@ -103,6 +103,7 @@ void config_dump(void)
 	dump_param('S', config->set_point);
 	dump_param('B', config->band);
 	dump_param('T', config->sample_time_ms);
+	dump_param('E', config->emergency_off);
 	dump_param('O', config->auto_off_time);
 	dump_param('F', config->flags);
 	uart_putc('\n');
@@ -165,6 +166,10 @@ void config_scan_input(const char *str)
 	case 'T':
 		/* sample time */
 		config->sample_time_ms = val;
+		break;
+	case 'E':
+		/* emergency off temperature threshold */
+		config->emergency_off = val;
 		break;
 	case 'O':
 		/* auto off time */
