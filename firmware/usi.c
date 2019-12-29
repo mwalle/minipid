@@ -298,6 +298,7 @@ void uart_tx_twi_init(void)
 	/* enable overflow interrupt */
 	TIMSK |= _BV(TOIE0);
 
+	__uart_rx_idx = -1;
 	__usi_state = USI_IDLE;
 }
 
