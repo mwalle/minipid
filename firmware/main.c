@@ -115,6 +115,13 @@ enum {
 	ERROR_EMERGENCY_OFF = 4,
 };
 
+static void reset(void) __attribute__((noreturn));
+static void reset(void)
+{
+	WDTCR = _BV(WDE);
+	while (true);
+}
+
 static void configuration_mode(void)
 {
 	const char *buf;
@@ -153,6 +160,8 @@ again:
 			config_dump();
 		} else if (buf[0] == '\r') {
 			continue;
+		} else if (!strncmp_P(buf, PSTR("reset"), 5)) {
+			reset();
 		} else if (!strncmp_P(buf, PSTR("dump"), 4)) {
 			config_dump();
 		} else if (!strncmp_P(buf, PSTR("save"), 4)) {
@@ -165,9 +174,10 @@ again:
 			uart_puts_P(PSTR(
 						"Available commands:\n"
 						".<P> <V> - set parameter <P> to value <V>\n"
-						"dump - show config\n"
-						"save - show config\n"
-						"exit - show config\n"));
+						"dump  - show config\n"
+						"save  - show config\n"
+						"reset - reset controller\n"
+						"exit  - show config\n"));
 		} else {
 			uart_puts_P(PSTR("Unknown command, try 'help'.\n"));
 		}
@@ -307,6 +317,11 @@ int main(void)
 	int16_t error;
 	int16_t out;
 	uint16_t emergency_off_adc_val;
+
+	/* clear watchdog */
+	MCUSR = 0;
+	WDTCR |= _BV(WDCE) | _BV(WDE);
+	WDTCR = 0;
 
 	config_init();
 	emergency_off_adc_val = degc2adc(config->emergency_off);
