@@ -106,7 +106,7 @@ int16_t pid_update(int16_t error, int16_t position)
 	p = (int32_t)pid->p_gain * error;
 
 	/* account error within limits */
-	i = (int32_t)pid->i_sum + (pid->i_gain * error * config->sample_time_ms / 1000);
+	i = (int32_t)pid->i_sum + ((int32_t)pid->i_gain * error * config->sample_time_ms / 1000);
 #if 0
 	if (pid->out_last > pid->out_max) {
 		//printf("remove %d..", pid->i_sum);
