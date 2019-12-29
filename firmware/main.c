@@ -264,6 +264,22 @@ static uint8_t display_digit(uint8_t i)
 	return pgm_read_byte(&(digits[i]));
 }
 
+static void display_errorcode(uint8_t code)
+{
+	static uint8_t buf[5];
+
+	buf[0] = 0x02;
+	twi_transfer(buf, 1);
+
+	buf[0] = '\x03';
+	buf[1] = display_digit(14);
+	buf[2] = display_digit(0);
+	buf[3] = display_digit(0);
+	buf[4] = display_digit(code % 10);
+
+	twi_transfer(buf, 5);
+}
+
 static void display_degc(uint8_t val)
 {
 	static uint8_t buf[5];
@@ -317,6 +333,7 @@ int main(void)
 	int16_t error;
 	int16_t out;
 	uint16_t emergency_off_adc_val;
+	uint8_t errorcode;
 
 	/* clear watchdog */
 	MCUSR = 0;
@@ -379,12 +396,21 @@ int main(void)
 
 	while (true) {
 		adc_val = adc_get();
-		if (adc_val == ADC_OPEN)
-			blink_errorcode(ERROR_SENSOR_UNCONNECTED);
-		if (adc_val == ADC_SHORT)
-			blink_errorcode(ERROR_SENSOR_SHORTED);
-		if (adc_val >= emergency_off_adc_val)
-			blink_errorcode(ERROR_EMERGENCY_OFF);
+		if (adc_val == ADC_OPEN) {
+			errorcode = ERROR_SENSOR_UNCONNECTED;
+		} else if (adc_val == ADC_SHORT) {
+			errorcode = ERROR_SENSOR_SHORTED;
+		} else if (adc_val >= emergency_off_adc_val) {
+			errorcode = ERROR_EMERGENCY_OFF;
+		} else {
+			errorcode = 0;
+		}
+
+		if (errorcode) {
+			if (display_enabled)
+				display_errorcode(errorcode);
+			blink_errorcode(errorcode);
+		}
 		degc = adc2degc(adc_val);
 
 		_uptime = uptime();
