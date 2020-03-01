@@ -37,7 +37,7 @@ program: $(TARGET).hex
 	avrdude -p$(PMCU) -P$(PORT) -B$(BAUD) -c$(PROGRAMMER) -Uflash:w:$(TARGET).hex:a
 
 fuse:
-	avrdude -p$(PMCU) -P$(PORT) -B$(BAUD) -c$(PROGRAMMER) -U lfuse:w:0xe2:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
+	avrdude -p$(PMCU) -P$(PORT) -B$(BAUD) -c$(PROGRAMMER) -U lfuse:w:0xe2:m -U hfuse:w:0xdd:m -U efuse:w:0xff:m
 
 clean:
 	rm -rf *.o
